@@ -4,6 +4,8 @@
 #include <Rcpp.h>
 #include "reference.h"
 
+/******************************************************************************/
+
 class Repository
 {
 public:
@@ -18,7 +20,7 @@ public:
     Rcpp::Reference head();
     // git_repository_head_detached,
     // git_repository_head_orphan,
-    // git_repository_index,
+    Rcpp::Reference index();
     // git_repository_init,
     // git_repository_init_ext,
     bool is_bare();

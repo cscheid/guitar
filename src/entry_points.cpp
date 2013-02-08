@@ -5,7 +5,9 @@
 #include <git2.h>
 
 /******************************************************************************/
-// repository.h
+// entry point definitions
+
+// repository
 
 int (*_git_repository_open)(git_repository **out, const char *path);
 int (*_git_repository_wrap_odb)(git_repository **out, git_odb *odb);
@@ -63,11 +65,58 @@ int (*_git_repository_detach_head)(
 	git_repository* repo);
 int (*_git_repository_state)(git_repository *repo);
 
-/******************************************************************************/
 // reference
 
 void (*_git_reference_free)(git_reference *ref);
 
+// index
+
+int (*_git_index_open)(git_index **out, const char *index_path);
+int (*_git_index_new)(git_index **out);
+void (*_git_index_free)(git_index *index);
+git_repository * (*_git_index_owner)(const git_index *index);
+unsigned int (*_git_index_caps)(const git_index *index);
+int (*_git_index_set_caps)(git_index *index, unsigned int caps);
+int (*_git_index_read)(git_index *index);
+int (*_git_index_write)(git_index *index);
+int (*_git_index_read_tree)(git_index *index, const git_tree *tree);
+int (*_git_index_write_tree)(git_oid *out, git_index *index);
+int (*_git_index_write_tree_to)(git_oid *out, git_index *index, git_repository *repo);
+size_t (*_git_index_entrycount)(const git_index *index);
+void (*_git_index_clear)(git_index *index);
+const git_index_entry * (*_git_index_get_byindex)(
+	git_index *index, size_t n);
+const git_index_entry * (*_git_index_get_bypath)(
+	git_index *index, const char *path, int stage);
+int (*_git_index_remove)(git_index *index, const char *path, int stage);
+int (*_git_index_remove_directory)(
+	git_index *index, const char *dir, int stage);
+int (*_git_index_add)(git_index *index, const git_index_entry *source_entry);
+int (*_git_index_entry_stage)(const git_index_entry *entry);
+int (*_git_index_add_bypath)(git_index *index, const char *path);
+int (*_git_index_remove_bypath)(git_index *index, const char *path);
+int (*_git_index_find)(size_t *at_pos, git_index *index, const char *path);
+int (*_git_index_conflict_add)(
+   git_index *index,
+	const git_index_entry *ancestor_entry,
+	const git_index_entry *our_entry,
+	const git_index_entry *their_entry);
+int (*_git_index_conflict_get)(git_index_entry **ancestor_out, git_index_entry **our_out, git_index_entry **their_out, git_index *index, const char *path);
+int (*_git_index_conflict_remove)(git_index *index, const char *path);
+void (*_git_index_conflict_cleanup)(git_index *index);
+int (*_git_index_has_conflicts)(const git_index *index);
+unsigned int (*_git_index_reuc_entrycount)(git_index *index);
+int (*_git_index_reuc_find)(size_t *at_pos, git_index *index, const char *path);
+const git_index_reuc_entry * (*_git_index_reuc_get_bypath)(git_index *index, const char *path);
+const git_index_reuc_entry * (*_git_index_reuc_get_byindex)(git_index *index, size_t n);
+int (*_git_index_reuc_add)(git_index *index, const char *path,
+	int ancestor_mode, git_oid *ancestor_id,
+	int our_mode, git_oid *our_id,
+	int their_mode, git_oid *their_id);
+int (*_git_index_reuc_remove)(git_index *index, size_t n);
+
+/******************************************************************************/
+// function 
 SEXP load_library()
 {
     BEGIN_RCPP
@@ -83,6 +132,9 @@ SEXP load_library()
     if (!_git_repository_open) {
         return Rcpp::LogicalVector::create(false);
     }
+
+    /**************************************************************************/
+    // now we load all entry points..
 
     _git_repository_free = (void (*)(git_repository*)) dlsym(result, "git_repository_free");
     _git_repository_open = (int (*)(git_repository **out, const char *path)) dlsym(result, "git_repository_open");
@@ -141,6 +193,49 @@ SEXP load_library()
                                            git_repository* repo)) dlsym(result, "git_repository_detach_head");
     _git_repository_state = (int (*)(git_repository *repo)) dlsym(result, "git_repository_state");
 
+    _git_index_open = (int (*)(git_index **out, const char *index_path)) dlsym(result, "git_index_open");
+    _git_index_new = (int (*)(git_index **out)) dlsym(result, "git_index_new");
+    _git_index_free = (void (*)(git_index *index)) dlsym(result, "git_index_free");
+    _git_index_owner = (git_repository * (*)(const git_index *index)) dlsym(result, "git_index_owner");
+    _git_index_caps = (unsigned int (*)(const git_index *index)) dlsym(result, "git_index_caps");
+    _git_index_set_caps = (int (*)(git_index *index, unsigned int caps)) dlsym(result, "git_index_set_caps");
+    _git_index_read = (int (*)(git_index *index)) dlsym(result, "git_index_read");
+    _git_index_write = (int (*)(git_index *index)) dlsym(result, "git_index_write");
+    _git_index_read_tree = (int (*)(git_index *index, const git_tree *tree)) dlsym(result, "git_index_read_tree");
+    _git_index_write_tree = (int (*)(git_oid *out, git_index *index)) dlsym(result, "git_index_write_tree");
+    _git_index_write_tree_to = (int (*)(git_oid *out, git_index *index, git_repository *repo)) dlsym(result, "git_index_write_tree_to");
+    _git_index_entrycount = (size_t (*)(const git_index *index)) dlsym(result, "git_index_entrycount");
+    _git_index_clear = (void (*)(git_index *index)) dlsym(result, "git_index_clear");
+    _git_index_get_byindex = (const git_index_entry * (*)(
+                                                          git_index *index, size_t n)) dlsym(result, "git_index_get_byindex");
+    _git_index_get_bypath = (const git_index_entry * (*)(
+                                                         git_index *index, const char *path, int stage)) dlsym(result, "git_index_get_bypath");
+    _git_index_remove = (int (*)(git_index *index, const char *path, int stage)) dlsym(result, "git_index_remove");
+    _git_index_remove_directory = (int (*)(
+                                           git_index *index, const char *dir, int stage)) dlsym(result, "git_index_remove_directory");
+    _git_index_add = (int (*)(git_index *index, const git_index_entry *source_entry)) dlsym(result, "git_index_add");
+    _git_index_entry_stage = (int (*)(const git_index_entry *entry)) dlsym(result, "git_index_entry_stage");
+    _git_index_add_bypath = (int (*)(git_index *index, const char *path)) dlsym(result, "git_index_add_bypath");
+    _git_index_remove_bypath = (int (*)(git_index *index, const char *path)) dlsym(result, "git_index_remove_bypath");
+    _git_index_find = (int (*)(size_t *at_pos, git_index *index, const char *path)) dlsym(result, "git_index_find");
+    _git_index_conflict_add = (int (*)(
+   git_index *index,
+	const git_index_entry *ancestor_entry,
+	const git_index_entry *our_entry,
+   const git_index_entry *their_entry)) dlsym(result, "git_index_conflict_add");
+    _git_index_conflict_get = (int (*)(git_index_entry **ancestor_out, git_index_entry **our_out, git_index_entry **their_out, git_index *index, const char *path)) dlsym(result, "git_index_conflict_get");
+    _git_index_conflict_remove = (int (*)(git_index *index, const char *path)) dlsym(result, "git_index_conflict_remove");
+    _git_index_conflict_cleanup = (void (*)(git_index *index)) dlsym(result, "git_index_conflict_cleanup");
+    _git_index_has_conflicts = (int (*)(const git_index *index)) dlsym(result, "git_index_has_conflicts");
+    _git_index_reuc_entrycount = (unsigned int (*)(git_index *index)) dlsym(result, "git_index_reuc_entrycount");
+    _git_index_reuc_find = (int (*)(size_t *at_pos, git_index *index, const char *path)) dlsym(result, "git_index_reuc_find");
+    _git_index_reuc_get_bypath = (const git_index_reuc_entry * (*)(git_index *index, const char *path)) dlsym(result, "git_index_reuc_get_bypath");
+    _git_index_reuc_get_byindex = (const git_index_reuc_entry * (*)(git_index *index, size_t n)) dlsym(result, "git_index_reuc_get_byindex");
+    _git_index_reuc_add = (int (*)(git_index *index, const char *path,
+	int ancestor_mode, git_oid *ancestor_id,
+	int our_mode, git_oid *our_id,
+                                   int their_mode, git_oid *their_id)) dlsym(result, "git_index_reuc_add");
+    _git_index_reuc_remove = (int (*)(git_index *index, size_t n)) dlsym(result, "git_index_reuc_remove");
 
     return Rcpp::LogicalVector::create(true);
     END_RCPP

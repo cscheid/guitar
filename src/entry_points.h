@@ -5,6 +5,8 @@
 #include <git2.h>
 
 /******************************************************************************/
+// entry point declarations
+
 // repository.h
 
 extern int (*_git_repository_open)(git_repository **out, const char *path);
@@ -63,9 +65,54 @@ extern int (*_git_repository_detach_head)(
 	git_repository* repo);
 extern int (*_git_repository_state)(git_repository *repo);
 
-/******************************************************************************/
 // reference
 
 extern void (*_git_reference_free)(git_reference *ref);
+
+// index
+
+extern int (*_git_index_open)(git_index **out, const char *index_path);
+extern int (*_git_index_new)(git_index **out);
+extern void (*_git_index_free)(git_index *index);
+extern git_repository * (*_git_index_owner)(const git_index *index);
+extern unsigned int (*_git_index_caps)(const git_index *index);
+extern int (*_git_index_set_caps)(git_index *index, unsigned int caps);
+extern int (*_git_index_read)(git_index *index);
+extern int (*_git_index_write)(git_index *index);
+extern int (*_git_index_read_tree)(git_index *index, const git_tree *tree);
+extern int (*_git_index_write_tree)(git_oid *out, git_index *index);
+extern int (*_git_index_write_tree_to)(git_oid *out, git_index *index, git_repository *repo);
+extern size_t (*_git_index_entrycount)(const git_index *index);
+extern void (*_git_index_clear)(git_index *index);
+extern const git_index_entry * (*_git_index_get_byindex)(
+	git_index *index, size_t n);
+extern const git_index_entry * (*_git_index_get_bypath)(
+	git_index *index, const char *path, int stage);
+extern int (*_git_index_remove)(git_index *index, const char *path, int stage);
+extern int (*_git_index_remove_directory)(
+	git_index *index, const char *dir, int stage);
+extern int (*_git_index_add)(git_index *index, const git_index_entry *source_entry);
+extern int (*_git_index_entry_stage)(const git_index_entry *entry);
+extern int (*_git_index_add_bypath)(git_index *index, const char *path);
+extern int (*_git_index_remove_bypath)(git_index *index, const char *path);
+extern int (*_git_index_find)(size_t *at_pos, git_index *index, const char *path);
+extern int (*_git_index_conflict_add)(
+   git_index *index,
+	const git_index_entry *ancestor_entry,
+	const git_index_entry *our_entry,
+	const git_index_entry *their_entry);
+extern int (*_git_index_conflict_get)(git_index_entry **ancestor_out, git_index_entry **our_out, git_index_entry **their_out, git_index *index, const char *path);
+extern int (*_git_index_conflict_remove)(git_index *index, const char *path);
+extern void (*_git_index_conflict_cleanup)(git_index *index);
+extern int (*_git_index_has_conflicts)(const git_index *index);
+extern unsigned int (*_git_index_reuc_entrycount)(git_index *index);
+extern int (*_git_index_reuc_find)(size_t *at_pos, git_index *index, const char *path);
+extern const git_index_reuc_entry * (*_git_index_reuc_get_bypath)(git_index *index, const char *path);
+extern const git_index_reuc_entry * (*_git_index_reuc_get_byindex)(git_index *index, size_t n);
+extern int (*_git_index_reuc_add)(git_index *index, const char *path,
+	int ancestor_mode, git_oid *ancestor_id,
+	int our_mode, git_oid *our_id,
+	int their_mode, git_oid *their_id);
+extern int (*_git_index_reuc_remove)(git_index *index, size_t n);
 
 RcppExport SEXP load_library();
