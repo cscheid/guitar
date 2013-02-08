@@ -1,6 +1,10 @@
 #ifndef _guitar_RCPP_HELLO_WORLD_H
 #define _guitar_RCPP_HELLO_WORLD_H
 
+#include <RcppCommon.h>
+
+/******************************************************************************/
+
 #include <Rcpp.h>
 
 /*

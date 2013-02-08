@@ -1,14 +1,14 @@
 #include "guitar.h"
-#include <git2.h>
 #include <dlfcn.h>
 #include <cstdio>
 #include <string>
+#include <git2.h>
 #include <boost/shared_ptr.hpp>
 
 /******************************************************************************/
 
-using namespace Rcpp;
 using namespace boost;
+using namespace Rcpp;
 
 /******************************************************************************/
 // repository.h
@@ -79,9 +79,9 @@ void (*_git_reference_free)(git_reference *ref);
 class GitReference
 {
 public:
-    explicit GitReference(git_reference *_ref) {
+    explicit GitReference(git_reference *_ref)  {
         ref = boost::shared_ptr<git_reference>(_ref, _git_reference_free);
-    }
+    }; 
 
 protected:
     boost::shared_ptr<git_reference> ref;
@@ -107,7 +107,11 @@ public:
     // git_repository_fetchhead_foreach,
     // git_repository_free,
     // git_repository_hashfile,
-    // Reference head(),
+    Rcpp::Reference head() {
+        git_reference *ref;
+        _git_repository_head(&ref, repo.get());
+        return Rcpp::internal::make_new_object(new GitReference(ref));
+    };
     // git_repository_head_detached,
     // git_repository_head_orphan,
     // git_repository_index,
@@ -143,11 +147,14 @@ protected:
 };
 
 RCPP_MODULE(guitar) {
+    class_<GitReference>("Reference")
+        ;
     class_<Repository>("Repository")
         .constructor<std::string>()
+        .method("head", &Repository::head)
         .method("is_bare", &Repository::is_bare)
         .method("workdir", &Repository::workdir)
-    ;
+        ;
 };
 
 SEXP load_library()
