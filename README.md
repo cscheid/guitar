@@ -2,7 +2,7 @@
 
 # GUITAR IS PRETTY MUCH NOT WORKING YET
 
-Hi! You're now touring the [sausage factory]. This notice will disappear
+Hi! You're now touring the [sausage factory](http://en.wikiquote.org/wiki/John_Godfrey_Saxe). This notice will disappear
 once `guitar` is ready for public consumption.
 
 ## But I want to try it!
