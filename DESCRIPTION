@@ -1,0 +1,12 @@
+Package: guitar
+Type: Package
+Title: git bindings for R
+Version: 0.0.1
+Date: 2013-02-07
+Author: Carlos Scheidegger
+Maintainer: Carlos Scheidegger <cscheid@research.att.com>
+Description: git bindings for R via libgit2
+License: GPL plus linking exception (same as libgit2)
+Depends: Rcpp (>= 0.10.2)
+LinkingTo: Rcpp
+RcppModules: guitar

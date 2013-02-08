@@ -1,0 +1,3 @@
+useDynLib(guitar)
+import(Rcpp)
+exportPattern("^[[:alpha:]]+")
