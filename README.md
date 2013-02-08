@@ -20,8 +20,8 @@ open an issue so we can discuss submitted patches.
 combined magic of [libgit2](http://github.com/libgit2/libgit2/) and
 [Rcpp](http://dirk.eddelbuettel.com/code/rcpp.html).
 
-`guitar` is meant to be easy to use with simple classes, and methods
-mapping pretty directly into libgit2. If you have a hard time with it,
+`guitar` is meant to be easy to use, with simple classes and methods
+mapping pretty directly into libgit2's API. If you have a hard time with it,
 please file documentation [issues](http://github.com/cscheid/guitar/issues) on github. If you really don't
 like it, you can alternatively use the chorus to Cake's 
 [homonymous song](http://www.lyricsfreak.com/c/cake/guitar_20026676.html) for
@@ -29,5 +29,6 @@ inspiration :)
 
 # Dependencies
 
-You'll need to install libgit2 with shared library support (possibly
-the default).
+You'll need to install libgit2 with shared library support (this is
+possibly the default for any sensible installation), and you'll need
+boost (I like shared pointers).

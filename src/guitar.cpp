@@ -3,10 +3,12 @@
 #include <dlfcn.h>
 #include <cstdio>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 /******************************************************************************/
 
 using namespace Rcpp;
+using namespace boost;
 
 /******************************************************************************/
 // repository.h
@@ -68,18 +70,36 @@ int (*_git_repository_detach_head)(
 int (*_git_repository_state)(git_repository *repo);
 
 /******************************************************************************/
+// reference
+
+void (*_git_reference_free)(git_reference *ref);
+
+/******************************************************************************/
+
+class GitReference
+{
+public:
+    explicit GitReference(git_reference *_ref) {
+        ref = boost::shared_ptr<git_reference>(_ref, _git_reference_free);
+    }
+
+protected:
+    boost::shared_ptr<git_reference> ref;
+};
 
 class Repository
 {
 public:
     explicit Repository(std::string path) {
-        _git_repository_open(&repo, path.c_str());
+        git_repository *_repo;
+        _git_repository_open(&_repo, path.c_str());
+        repo = boost::shared_ptr<git_repository>(_repo, _git_repository_free);
     }
-    ~Repository() {
-        if (repo) {
-            _git_repository_free(repo);
-        }
-    }
+    // ~Repository() {
+    //     if (repo) {
+    //         _git_repository_free(repo);
+    //     }
+    // }
 
     // git_repository_config,
     // git_repository_detach_head,
@@ -87,14 +107,14 @@ public:
     // git_repository_fetchhead_foreach,
     // git_repository_free,
     // git_repository_hashfile,
-    // git_repository_head,
+    // Reference head(),
     // git_repository_head_detached,
     // git_repository_head_orphan,
     // git_repository_index,
     // git_repository_init,
     // git_repository_init_ext,
     bool is_bare() {
-        return _git_repository_is_bare(repo);
+        return _git_repository_is_bare(repo.get());
     };
     // git_repository_is_empty,
     // git_repository_merge_cleanup,
@@ -113,13 +133,13 @@ public:
     // git_repository_set_workdir,
     // git_repository_state,
     std::string workdir() {
-        const char *r = _git_repository_workdir(repo);
+        const char *r = _git_repository_workdir(repo.get());
         return r ? std::string(r) : std::string("");
     };
     // git_repository_wrap_odb,
 
 protected:
-    git_repository *repo;
+    boost::shared_ptr<git_repository> repo;
 };
 
 RCPP_MODULE(guitar) {
@@ -134,7 +154,12 @@ SEXP load_library()
 {
     BEGIN_RCPP
 
-    void *result = dlopen("libgit2.dylib", RTLD_LAZY);
+    void *result;
+    result = dlopen("libgit2.dylib", RTLD_LAZY);
+    if (!result) {
+        result = dlopen("libgit2.so", RTLD_LAZY);
+    }
+
     _git_repository_open = (int (*)(git_repository**, const char*)) dlsym(result, "git_repository_open");
 
     if (!_git_repository_open) {
