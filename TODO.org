@@ -1,0 +1,4 @@
+The big list of guitar TODOs
+
+* test with known-existing git repositories
+** Learn how to make testthat change directories to inside the package, learn how to make r cmd build package extra stuff for testing.

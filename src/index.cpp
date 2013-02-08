@@ -42,5 +42,9 @@ void Index::clear()
 
 RCPP_MODULE(guitar_index) {
     class_<Index>("Index")
+        .method("read", &Index::read)
+        .method("write", &Index::write)
+        .method("entrycount", &Index::entrycount)
+        .method("clear", &Index::clear)
         ;
 }
