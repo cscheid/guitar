@@ -67,7 +67,50 @@ int (*_git_repository_state)(git_repository *repo);
 
 // reference
 
+int (*_git_reference_lookup)(git_reference **out, git_repository *repo, const char *name);
+int (*_git_reference_name_to_id)(
+	git_oid *out, git_repository *repo, const char *name);
+int (*_git_reference_symbolic_create)(git_reference **out, git_repository *repo, const char *name, const char *target, int force);
+int (*_git_reference_create)(git_reference **out, git_repository *repo, const char *name, const git_oid *id, int force);
+const git_oid * (*_git_reference_target)(const git_reference *ref);
+const char * (*_git_reference_symbolic_target)(const git_reference *ref);
+git_ref_t (*_git_reference_type)(const git_reference *ref);
+const char * (*_git_reference_name)(const git_reference *ref);
+int (*_git_reference_resolve)(git_reference **out, const git_reference *ref);
+git_repository * (*_git_reference_owner)(const git_reference *ref);
+int (*_git_reference_symbolic_set_target)(git_reference *ref, const char *target);
+int (*_git_reference_set_target)(git_reference *ref, const git_oid *id);
+int (*_git_reference_rename)(git_reference *ref, const char *name, int force);
+int (*_git_reference_delete)(git_reference *ref);
+int (*_git_reference_packall)(git_repository *repo);
+int (*_git_reference_list)(git_strarray *array, git_repository *repo, unsigned int list_flags);int (*_git_reference_foreach)(
+	git_repository *repo,
+	unsigned int list_flags,
+	git_reference_foreach_cb callback,
+	void *payload);
+int (*_git_reference_is_packed)(git_reference *ref);
+int (*_git_reference_reload)(git_reference *ref);
 void (*_git_reference_free)(git_reference *ref);
+int (*_git_reference_cmp)(git_reference *ref1, git_reference *ref2);
+int (*_git_reference_foreach_glob)(
+	git_repository *repo,
+	const char *glob,
+	unsigned int list_flags,
+	git_reference_foreach_cb callback,
+	void *payload);
+int (*_git_reference_has_log)(git_reference *ref);
+int (*_git_reference_is_branch)(git_reference *ref);
+int (*_git_reference_is_remote)(git_reference *ref);
+int (*_git_reference_normalize_name)(
+	char *buffer_out,
+	size_t buffer_size,
+	const char *name,
+	unsigned int flags);
+int (*_git_reference_peel)(
+	git_object **out,
+	git_reference *ref,
+	git_otype type);
+int (*_git_reference_is_valid_name)(const char *refname);
 
 // index
 
@@ -114,6 +157,28 @@ int (*_git_index_reuc_add)(git_index *index, const char *path,
 	int our_mode, git_oid *our_id,
 	int their_mode, git_oid *their_id);
 int (*_git_index_reuc_remove)(git_index *index, size_t n);
+
+// oid
+
+int (*_git_oid_fromstr)(git_oid *out, const char *str);
+int (*_git_oid_fromstrn)(git_oid *out, const char *str, size_t length);
+void (*_git_oid_fromraw)(git_oid *out, const unsigned char *raw);
+void (*_git_oid_fmt)(char *out, const git_oid *id);
+void (*_git_oid_pathfmt)(char *out, const git_oid *id);
+char * (*_git_oid_allocfmt)(const git_oid *id);
+char * (*_git_oid_tostr)(char *out, size_t n, const git_oid *id);
+void (*_git_oid_cpy)(git_oid *out, const git_oid *src);
+int (*_git_oid_ncmp)(const git_oid *a, const git_oid *b, size_t len);
+int (*_git_oid_streq)(const git_oid *id, const char *str);
+int (*_git_oid_iszero)(const git_oid *id);
+git_oid_shorten * (*_git_oid_shorten_new)(size_t min_length);
+int (*_git_oid_shorten_add)(git_oid_shorten *os, const char *text_id);
+void (*_git_oid_shorten_free)(git_oid_shorten *os);
+
+// strarray
+
+void (*_git_strarray_free)(git_strarray *array);
+int (*_git_strarray_copy)(git_strarray *tgt, const git_strarray *src);
 
 /******************************************************************************/
 // function 
@@ -236,6 +301,70 @@ SEXP load_library()
 	int our_mode, git_oid *our_id,
                                    int their_mode, git_oid *their_id)) dlsym(result, "git_index_reuc_add");
     _git_index_reuc_remove = (int (*)(git_index *index, size_t n)) dlsym(result, "git_index_reuc_remove");
+
+    _git_reference_lookup = (int (*)(git_reference **out, git_repository *repo, const char *name)) dlsym(result, "git_reference_lookup");
+    _git_reference_name_to_id = (int (*)(
+                                         git_oid *out, git_repository *repo, const char *name)) dlsym(result, "git_reference_name_to_id");
+    _git_reference_symbolic_create = (int (*)(git_reference **out, git_repository *repo, const char *name, const char *target, int force)) dlsym(result, "git_reference_symbolic_create");
+    _git_reference_create = (int (*)(git_reference **out, git_repository *repo, const char *name, const git_oid *id, int force)) dlsym(result, "git_reference_create");
+    _git_reference_target = (const git_oid * (*)(const git_reference *ref)) dlsym(result, "git_reference_target");
+    _git_reference_symbolic_target = (const char * (*)(const git_reference *ref)) dlsym(result, "git_reference_symbolic_target");
+    _git_reference_type = (git_ref_t (*)(const git_reference *ref)) dlsym(result, "git_reference_type");
+    _git_reference_name = (const char * (*)(const git_reference *ref)) dlsym(result, "git_reference_name");
+    _git_reference_resolve = (int (*)(git_reference **out, const git_reference *ref)) dlsym(result, "git_reference_resolve");
+    _git_reference_owner = (git_repository * (*)(const git_reference *ref)) dlsym(result, "git_reference_owner");
+    _git_reference_symbolic_set_target = (int (*)(git_reference *ref, const char *target)) dlsym(result, "git_reference_symbolic_set_target");
+    _git_reference_set_target = (int (*)(git_reference *ref, const git_oid *id)) dlsym(result, "git_reference_set_target");
+    _git_reference_rename = (int (*)(git_reference *ref, const char *name, int force)) dlsym(result, "git_reference_rename");
+    _git_reference_delete = (int (*)(git_reference *ref)) dlsym(result, "git_reference_delete");
+    _git_reference_packall = (int (*)(git_repository *repo)) dlsym(result, "git_reference_packall");
+    _git_reference_list = (int (*)(git_strarray *array, git_repository *repo, unsigned int list_flags)) dlsym(result, "git_reference_list");
+    _git_reference_foreach = (int (*)(
+	git_repository *repo,
+	unsigned int list_flags,
+	git_reference_foreach_cb callback,
+	void *payload)) dlsym(result, "git_reference_foreach");
+    _git_reference_is_packed = (int (*)(git_reference *ref)) dlsym(result, "git_reference_is_packed");
+    _git_reference_reload = (int (*)(git_reference *ref)) dlsym(result, "git_reference_reload");
+    _git_reference_free = (void (*)(git_reference *ref)) dlsym(result, "git_reference_free");
+    _git_reference_cmp = (int (*)(git_reference *ref1, git_reference *ref2)) dlsym(result, "git_reference_cmp");
+    _git_reference_foreach_glob = (int (*)(
+	git_repository *repo,
+	const char *glob,
+	unsigned int list_flags,
+	git_reference_foreach_cb callback,
+	void *payload)) dlsym(result, "git_reference_foreach_glob");
+    _git_reference_has_log = (int (*)(git_reference *ref)) dlsym(result, "git_reference_has_log");
+    _git_reference_is_branch = (int (*)(git_reference *ref)) dlsym(result, "git_reference_is_branch");
+    _git_reference_is_remote = (int (*)(git_reference *ref)) dlsym(result, "git_reference_is_remote");
+    _git_reference_normalize_name = (int (*)(
+	char *buffer_out,
+	size_t buffer_size,
+	const char *name,
+	unsigned int flags)) dlsym(result, "git_reference_normalize_name");
+    _git_reference_peel = (int (*)(
+	git_object **out,
+	git_reference *ref,
+	git_otype type)) dlsym(result, "git_reference_peel");
+    _git_reference_is_valid_name = (int (*)(const char *refname)) dlsym(result, "git_reference_is_valid_name");
+    
+    _git_oid_fromstr = (int (*)(git_oid *out, const char *str)) dlsym(result, "git_oid_fromstr");
+    _git_oid_fromstrn = (int (*)(git_oid *out, const char *str, size_t length)) dlsym(result, "git_oid_fromstrn");
+    _git_oid_fromraw = (void (*)(git_oid *out, const unsigned char *raw)) dlsym(result, "git_oid_fromraw");
+    _git_oid_fmt = (void (*)(char *out, const git_oid *id)) dlsym(result, "git_oid_fmt");
+    _git_oid_pathfmt = (void (*)(char *out, const git_oid *id)) dlsym(result, "git_oid_pathfmt");
+    _git_oid_allocfmt = (char * (*)(const git_oid *id)) dlsym(result, "git_oid_allocfmt");
+    _git_oid_tostr = (char * (*)(char *out, size_t n, const git_oid *id)) dlsym(result, "git_oid_tostr");
+    _git_oid_cpy = (void (*)(git_oid *out, const git_oid *src)) dlsym(result, "git_oid_cpy");
+    _git_oid_ncmp = (int (*)(const git_oid *a, const git_oid *b, size_t len)) dlsym(result, "git_oid_ncmp");
+    _git_oid_streq = (int (*)(const git_oid *id, const char *str)) dlsym(result, "git_oid_streq");
+    _git_oid_iszero = (int (*)(const git_oid *id)) dlsym(result, "git_oid_iszero");
+    _git_oid_shorten_new = (git_oid_shorten * (*)(size_t min_length)) dlsym(result, "git_oid_shorten_new");
+    _git_oid_shorten_add = (int (*)(git_oid_shorten *os, const char *text_id)) dlsym(result, "git_oid_shorten_add");
+    _git_oid_shorten_free = (void (*)(git_oid_shorten *os)) dlsym(result, "git_oid_shorten_free");
+
+    _git_strarray_free = (void (*)(git_strarray *array)) dlsym(result, "git_strarray_free");
+    _git_strarray_copy = (int (*)(git_strarray *tgt, const git_strarray *src)) dlsym(result, "git_strarray_copy");
 
     return Rcpp::LogicalVector::create(true);
     END_RCPP

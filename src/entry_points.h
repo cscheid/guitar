@@ -67,7 +67,51 @@ extern int (*_git_repository_state)(git_repository *repo);
 
 // reference
 
+extern int (*_git_reference_lookup)(git_reference **out, git_repository *repo, const char *name);
+extern int (*_git_reference_name_to_id)(
+	git_oid *out, git_repository *repo, const char *name);
+extern int (*_git_reference_symbolic_create)(git_reference **out, git_repository *repo, const char *name, const char *target, int force);
+extern int (*_git_reference_create)(git_reference **out, git_repository *repo, const char *name, const git_oid *id, int force);
+extern const git_oid * (*_git_reference_target)(const git_reference *ref);
+extern const char * (*_git_reference_symbolic_target)(const git_reference *ref);
+extern git_ref_t (*_git_reference_type)(const git_reference *ref);
+extern const char * (*_git_reference_name)(const git_reference *ref);
+extern int (*_git_reference_resolve)(git_reference **out, const git_reference *ref);
+extern git_repository * (*_git_reference_owner)(const git_reference *ref);
+extern int (*_git_reference_symbolic_set_target)(git_reference *ref, const char *target);
+extern int (*_git_reference_set_target)(git_reference *ref, const git_oid *id);
+extern int (*_git_reference_rename)(git_reference *ref, const char *name, int force);
+extern int (*_git_reference_delete)(git_reference *ref);
+extern int (*_git_reference_packall)(git_repository *repo);
+extern int (*_git_reference_list)(git_strarray *array, git_repository *repo, unsigned int list_flags);
+extern int (*_git_reference_foreach)(
+	git_repository *repo,
+	unsigned int list_flags,
+	git_reference_foreach_cb callback,
+	void *payload);
+extern int (*_git_reference_is_packed)(git_reference *ref);
+extern int (*_git_reference_reload)(git_reference *ref);
 extern void (*_git_reference_free)(git_reference *ref);
+extern int (*_git_reference_cmp)(git_reference *ref1, git_reference *ref2);
+extern int (*_git_reference_foreach_glob)(
+	git_repository *repo,
+	const char *glob,
+	unsigned int list_flags,
+	git_reference_foreach_cb callback,
+	void *payload);
+extern int (*_git_reference_has_log)(git_reference *ref);
+extern int (*_git_reference_is_branch)(git_reference *ref);
+extern int (*_git_reference_is_remote)(git_reference *ref);
+extern int (*_git_reference_normalize_name)(
+	char *buffer_out,
+	size_t buffer_size,
+	const char *name,
+	unsigned int flags);
+extern int (*_git_reference_peel)(
+	git_object **out,
+	git_reference *ref,
+	git_otype type);
+extern int (*_git_reference_is_valid_name)(const char *refname);
 
 // index
 
@@ -114,5 +158,29 @@ extern int (*_git_index_reuc_add)(git_index *index, const char *path,
 	int our_mode, git_oid *our_id,
 	int their_mode, git_oid *their_id);
 extern int (*_git_index_reuc_remove)(git_index *index, size_t n);
+
+// oid
+
+extern int (*_git_oid_fromstr)(git_oid *out, const char *str);
+extern int (*_git_oid_fromstrn)(git_oid *out, const char *str, size_t length);
+extern void (*_git_oid_fromraw)(git_oid *out, const unsigned char *raw);
+extern void (*_git_oid_fmt)(char *out, const git_oid *id);
+extern void (*_git_oid_pathfmt)(char *out, const git_oid *id);
+extern char * (*_git_oid_allocfmt)(const git_oid *id);
+extern char * (*_git_oid_tostr)(char *out, size_t n, const git_oid *id);
+extern void (*_git_oid_cpy)(git_oid *out, const git_oid *src);
+extern int (*_git_oid_ncmp)(const git_oid *a, const git_oid *b, size_t len);
+extern int (*_git_oid_streq)(const git_oid *id, const char *str);
+extern int (*_git_oid_iszero)(const git_oid *id);
+extern git_oid_shorten * (*_git_oid_shorten_new)(size_t min_length);
+extern int (*_git_oid_shorten_add)(git_oid_shorten *os, const char *text_id);
+extern void (*_git_oid_shorten_free)(git_oid_shorten *os);
+
+// strarray
+
+extern void (*_git_strarray_free)(git_strarray *array);
+extern int (*_git_strarray_copy)(git_strarray *tgt, const git_strarray *src);
+
+/******************************************************************************/
 
 RcppExport SEXP load_library();

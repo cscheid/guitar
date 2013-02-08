@@ -43,6 +43,10 @@ public:
     std::string workdir();
     // git_repository_wrap_odb,
 
+    Rcpp::Reference reference_lookup(std::string name); // returns a GitReference object
+    Rcpp::Reference name_to_id(std::string name); // returns a OID object
+    SEXP reference_list(unsigned int flags); // returns a list of characters
+
 protected:
     boost::shared_ptr<git_repository> repo;
 };
