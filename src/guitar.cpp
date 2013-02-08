@@ -1,4 +1,4 @@
-#include "rcpp_hello_world.h"
+#include "guitar.h"
 #include <git2.h>
 #include <dlfcn.h>
 #include <cstdio>
