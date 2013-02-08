@@ -29,7 +29,7 @@ public:
     // git_repository_mergehead_foreach,
     // git_repository_message,
     // git_repository_message_remove,
-    // git_repository_odb,
+    Rcpp::Reference odb();
     // git_repository_open,
     // git_repository_open_ext,
     // git_repository_path,

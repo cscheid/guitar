@@ -181,6 +181,36 @@ extern void (*_git_oid_shorten_free)(git_oid_shorten *os);
 extern void (*_git_strarray_free)(git_strarray *array);
 extern int (*_git_strarray_copy)(git_strarray *tgt, const git_strarray *src);
 
+// odb
+
+extern int (*_git_odb_new)(git_odb **out);
+extern int (*_git_odb_open)(git_odb **out, const char *objects_dir);
+extern int (*_git_odb_add_backend)(git_odb *odb, git_odb_backend *backend, int priority);
+extern int (*_git_odb_add_alternate)(git_odb *odb, git_odb_backend *backend, int priority);
+extern int (*_git_odb_add_disk_alternate)(git_odb *odb, const char *path);
+extern void (*_git_odb_free)(git_odb *db);
+extern int (*_git_odb_read)(git_odb_object **out, git_odb *db, const git_oid *id);
+extern int (*_git_odb_read_prefix)(git_odb_object **out, git_odb *db, const git_oid *short_id, size_t len);
+extern int (*_git_odb_read_header)(size_t *len_out, git_otype *type_out, git_odb *db, const git_oid *id);
+extern int (*_git_odb_exists)(git_odb *db, const git_oid *id);
+extern int (*_git_odb_refresh)(struct git_odb *db);
+extern int (*_git_odb_foreach)(git_odb *db, git_odb_foreach_cb cb, void *payload);
+extern int (*_git_odb_write)(git_oid *out, git_odb *odb, const void *data, size_t len, git_otype type);
+extern int (*_git_odb_open_wstream)(git_odb_stream **out, git_odb *db, size_t size, git_otype type);
+extern int (*_git_odb_open_rstream)(git_odb_stream **out, git_odb *db, const git_oid *oid);
+extern int (*_git_odb_write_pack)(
+	git_odb_writepack **out,
+	git_odb *db,
+	git_transfer_progress_callback progress_cb,
+	void *progress_payload);
+extern int (*_git_odb_hash)(git_oid *out, const void *data, size_t len, git_otype type);
+extern int (*_git_odb_hashfile)(git_oid *out, const char *path, git_otype type);
+extern void (*_git_odb_object_free)(git_odb_object *object);
+extern const git_oid * (*_git_odb_object_id)(git_odb_object *object);
+extern const void * (*_git_odb_object_data)(git_odb_object *object);
+extern size_t (*_git_odb_object_size)(git_odb_object *object);
+extern git_otype (*_git_odb_object_type)(git_odb_object *object);
+
 /******************************************************************************/
 
 RcppExport SEXP load_library();

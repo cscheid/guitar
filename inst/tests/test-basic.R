@@ -16,6 +16,11 @@ test_that("repositories have indices", {
   expect_that(r$index(), is_a("Rcpp_Index"))
 })
 
+test_that("repositories have ODBs", {
+  r <- new(guitar::Repository, repo.path)
+  expect_that(r$odb(), is_a("Rcpp_ODB"))
+})
+
 test_that("references can be found by name", {
   repo <- new(guitar::Repository, repo.path)
   ref <- repo$reference_lookup("refs/heads/master")

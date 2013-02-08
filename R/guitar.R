@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname) {
   loadRcppModules();
   if (!.Call("load_library", PACKAGE="guitar")) {
-    cat("Could not load shared library; this is possibly not going to work.\n");
+    cat("Could not successfully load shared library; this is not going to work.\n");
   }
 }
 

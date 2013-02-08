@@ -3,6 +3,7 @@
 #include "index.h"
 #include "reference.h"
 #include "oid.h"
+#include "odb.h"
 
 /******************************************************************************/
 
@@ -16,13 +17,15 @@ Repository::Repository(std::string path)
     repo = boost::shared_ptr<git_repository>(_repo, _git_repository_free);
 }
 
-Rcpp::Reference Repository::head() {
+Rcpp::Reference Repository::head()
+{
     git_reference *ref;
     _git_repository_head(&ref, repo.get());
     return Rcpp::internal::make_new_object(new GitReference(ref));
 };
 
-Rcpp::Reference Repository::index() {
+Rcpp::Reference Repository::index()
+{
     git_index *ix;
     _git_repository_index(&ix, repo.get());
     return Rcpp::internal::make_new_object(new Index(ix));
@@ -33,13 +36,25 @@ bool Repository::is_bare()
     return _git_repository_is_bare(repo.get());
 };
 
+Rcpp::Reference Repository::odb()
+{
+    BEGIN_RCPP
+    git_odb *odb;
+    int result = _git_repository_odb(&odb, repo.get());
+    if (result)
+        throw Rcpp::exception("Repository::odb error");
+    return Rcpp::internal::make_new_object(new ODB(odb));
+    END_RCPP
+}
+
 std::string Repository::workdir()
 {
     const char *r = _git_repository_workdir(repo.get());
     return r ? std::string(r) : std::string("");
 };
 
-Rcpp::Reference Repository::reference_lookup(std::string name) {
+Rcpp::Reference Repository::reference_lookup(std::string name)
+{
     BEGIN_RCPP
     git_reference *ref;
     int result = _git_reference_lookup(&ref, repo.get(), name.c_str());
@@ -49,7 +64,8 @@ Rcpp::Reference Repository::reference_lookup(std::string name) {
     END_RCPP
 }
 
-Rcpp::Reference Repository::name_to_id(std::string name) {
+Rcpp::Reference Repository::name_to_id(std::string name)
+{
     BEGIN_RCPP
     OID *oid = new OID;
     int result = _git_reference_name_to_id((*oid), repo.get(), name.c_str());
@@ -61,7 +77,8 @@ Rcpp::Reference Repository::name_to_id(std::string name) {
     END_RCPP
 }
 
-SEXP Repository::reference_list(unsigned int flags) {
+SEXP Repository::reference_list(unsigned int flags)
+{
     BEGIN_RCPP
     git_strarray result;
     int err = _git_reference_list(&result, repo.get(), flags);
@@ -85,6 +102,7 @@ RCPP_MODULE(guitar_repository) {
         .method("head", &Repository::head)
         .method("index", &Repository::index)
         .method("is_bare", &Repository::is_bare)
+        .method("odb", &Repository::odb)
         .method("workdir", &Repository::workdir)
         .method("reference_lookup", &Repository::reference_lookup)
         .method("name_to_id", &Repository::name_to_id)
