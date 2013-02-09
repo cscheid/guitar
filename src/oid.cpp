@@ -37,6 +37,11 @@ const git_oid *OID::from_sexp(SEXP s)
     return oidp2;
 }
 
+Rcpp::Reference OID::create(const git_oid *oid)
+{
+    return Rcpp::internal::make_new_object(new OID(oid));
+}
+
 RCPP_MODULE(guitar_oid) {
     using namespace Rcpp;
     class_<OID>("OID")

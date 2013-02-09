@@ -5,6 +5,8 @@
   }
 }
 
+# I need this for now because I know of no other way to access the
+# .pointer slot from Rcpp.
 .extractPointer <- function(ref) {
   ref$.pointer
 }

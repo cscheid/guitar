@@ -8,13 +8,13 @@
 // The code below ICEs g++ on OS X 10.8.2.
 //
 // // ptr extracts the .pointer fiels from the c++-derived class
-// template <typename T> 
-//     inline Rcpp::XPtr<T> ptr(SEXP s)
-// {
-//     Rcpp::Function extractor = Rcpp::Environment::namespace_env("guitar")[".extractPointer"];
-//     SEXP s2 = extractor(s);
-//     return Rcpp::XPtr<T>(s2);
-// }
+
+template <typename T> Rcpp::XPtr<T> ptr(SEXP s)
+{
+    Rcpp::Function extractor = Rcpp::Environment::namespace_env("guitar")[".extractPointer"];
+    SEXP s2 = extractor(s);
+    return Rcpp::XPtr<T>(s2);
+}
 
 ODB::ODB(git_odb *_odb)
 {
@@ -23,13 +23,15 @@ ODB::ODB(git_odb *_odb)
 
 bool ODB::exists(SEXP s)
 {
+    Rcpp::XPtr<OID> p(ptr<OID>(s));
     return _git_odb_exists(odb.get(), OID::from_sexp(s));
 }
 
+// FIXME: add early termination by checking the result of callback.
 static int foreach_cb(const git_oid *id, void *payload)
 {
     Rcpp::Function *f = (Rcpp::Function *)payload;
-    Rcpp::Reference ref = Rcpp::internal::make_new_object(new OID(id));
+    Rcpp::Reference ref = OID::create(id);
     (*f)(ref);
     return 0;
 }
@@ -42,7 +44,7 @@ void ODB::foreach(Rcpp::Function fcall)
 static int list_cb(const git_oid *id, void *payload)
 {
     Rcpp::List *l = (Rcpp::List *)payload;
-    Rcpp::Reference ref = Rcpp::internal::make_new_object(new OID(id));
+    Rcpp::Reference ref = OID::create(id);
     l->push_back(ref);
     return 0;
 }
@@ -63,10 +65,10 @@ Rcpp::Reference ODB::read(SEXP s)
 
 RCPP_MODULE(guitar_odb) {
     using namespace Rcpp;
-    class_<ODB>("ODB")
-        .method("exists", &ODB::exists)
-        .method("foreach", &ODB::foreach)
-        .method("list", &ODB::list)
-        .method("read", &ODB::read)
+    class_<ODB>("ODB", "ODB is the git object database")
+        .method("exists", &ODB::exists, "given an OID, returns true if object with that OID is present")
+        .method("foreach", &ODB::foreach, "traverses list of OIDs, calls given function with each OID")
+        .method("list", &ODB::list, "returns list of OIDs in the ODB")
+        .method("read", &ODB::read, "returns the ODBObject with the given OID")
         ;
 }

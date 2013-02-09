@@ -11,11 +11,17 @@ class ODB
 public:
     explicit ODB(git_odb *odb);
 
-    // bool exists(Rcpp::XPtr<OID> oid);
-    bool exists(SEXP s);
+    // expects an OID, returns true if object with that OID is in the ODB.
+    bool exists(SEXP oid);
+
+    // traverses the list of OIDs, calls this function with each OID.
     void foreach(Rcpp::Function fcall);
+
+    // returns a list of OIDs
     Rcpp::List list();
-    Rcpp::Reference read(SEXP s);
+
+    // returns the ODBObject with the given OID 
+    Rcpp::Reference read(SEXP oid);
 
 protected:
     boost::shared_ptr<git_odb> odb;
