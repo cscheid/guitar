@@ -6,6 +6,11 @@ OID::OID()
     _git_oid_fromstr(&oid, GIT_OID_HEX_ZERO);
 }
 
+OID::OID(const git_oid *other_oid)
+{
+    oid = *other_oid;
+}
+
 OID::OID(std::string str)
 {
     if (str.size() < 40) {
