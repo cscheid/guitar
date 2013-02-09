@@ -19,6 +19,8 @@ public:
     operator git_oid *() { return &oid; }
     operator const git_oid *() const { return &oid; }
 
+    static const git_oid *from_sexp(SEXP s);
+
 protected:
     git_oid oid;
 };

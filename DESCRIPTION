@@ -9,4 +9,4 @@ Description: git bindings for R via libgit2
 License: GPL plus linking exception (same as libgit2)
 Depends: Rcpp (>= 0.10.2), testthat
 LinkingTo: Rcpp
-RcppModules: guitar_reference, guitar_repository, guitar_types, guitar_index, guitar_oid, guitar_odb
+RcppModules: guitar_reference, guitar_repository, guitar_types, guitar_index, guitar_oid, guitar_odb_object, guitar_odb

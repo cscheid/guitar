@@ -29,3 +29,11 @@ test_that("references can be found by name", {
   expect_that(oid, is_a("Rcpp_OID"))
   expect_that(oid$fmt(), is_a("character"));
 })
+
+test_that("repositories have ODBs which can be listed", {
+  r <- new(guitar::Repository, repo.path)
+  o <- r$odb()
+  expect_that(o, is_a("Rcpp_ODB"))
+  l <- o$list()
+  expect_that(o$exists(l[[1]]), equals(TRUE))
+})

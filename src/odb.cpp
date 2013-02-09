@@ -1,18 +1,29 @@
 #include "odb.h"
 #include "entry_points.h"
+#include "odb_object.h"
+#include <cstdio>
 
 /******************************************************************************/
+
+// The code below ICEs g++ on OS X 10.8.2.
+//
+// // ptr extracts the .pointer fiels from the c++-derived class
+// template <typename T> 
+//     inline Rcpp::XPtr<T> ptr(SEXP s)
+// {
+//     Rcpp::Function extractor = Rcpp::Environment::namespace_env("guitar")[".extractPointer"];
+//     SEXP s2 = extractor(s);
+//     return Rcpp::XPtr<T>(s2);
+// }
 
 ODB::ODB(git_odb *_odb)
 {
     odb = boost::shared_ptr<git_odb>(_odb, _git_odb_free);
 }
 
-bool ODB::exists(Rcpp::XPtr<OID> oid)
+bool ODB::exists(SEXP s)
 {
-    const OID *oidp = static_cast<const OID*>(oid);
-    const git_oid *oidp2 = static_cast<const git_oid*>(*oidp);
-    return _git_odb_exists(odb.get(), oidp2);
+    return _git_odb_exists(odb.get(), OID::from_sexp(s));
 }
 
 static int foreach_cb(const git_oid *id, void *payload)
@@ -43,11 +54,19 @@ Rcpp::List ODB::list()
     return v;
 }
 
+Rcpp::Reference ODB::read(SEXP s)
+{
+    git_odb_object *result;
+    _git_odb_read(&result, odb.get(), OID::from_sexp(s));
+    return Rcpp::internal::make_new_object(new ODBObject(result));
+}
+
 RCPP_MODULE(guitar_odb) {
     using namespace Rcpp;
     class_<ODB>("ODB")
         .method("exists", &ODB::exists)
         .method("foreach", &ODB::foreach)
         .method("list", &ODB::list)
+        .method("read", &ODB::read)
         ;
 }
