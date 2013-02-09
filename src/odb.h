@@ -6,7 +6,7 @@
 
 /******************************************************************************/
 
-class ODB
+class ODB: public CPPWrapperObjectTraits<ODB, git_odb>
 {
 public:
     explicit ODB(git_odb *odb);
@@ -22,6 +22,9 @@ public:
 
     // returns the ODBObject with the given OID 
     Rcpp::Reference read(SEXP oid);
+
+    const git_odb *unwrap() const { return odb.get(); }
+    git_odb *unwrap() { return odb.get(); }
 
 protected:
     boost::shared_ptr<git_odb> odb;

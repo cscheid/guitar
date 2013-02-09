@@ -1,11 +1,9 @@
 #pragma once
 
-#include <RcppCommon.h>
-#include <Rcpp.h>
-#include <git2.h>
+#include "guitar.h"
 #include <boost/shared_ptr.hpp>
 
-class GitReference
+class GitReference: public CPPWrapperObjectTraits<GitReference, git_reference>
 {
 public:
     explicit GitReference(git_reference *_ref); 

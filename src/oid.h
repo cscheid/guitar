@@ -1,13 +1,10 @@
 #pragma once
 
-#include <RcppCommon.h>
-#include <Rcpp.h>
-#include <git2.h>
-#include "oid.h"
+#include "guitar.h"
 
 /******************************************************************************/
 
-class OID
+class OID: public CPPWrapperObjectTraits<OID, git_oid>
 {
 public:
     OID();
@@ -19,9 +16,6 @@ public:
     operator git_oid *() { return &oid; }
     operator const git_oid *() const { return unwrap(); }
     const git_oid *unwrap() const { return &oid; }
-
-    static const git_oid *from_sexp(SEXP s);
-    static Rcpp::Reference create(const git_oid *oid);
 
 protected:
     git_oid oid;

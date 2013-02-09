@@ -29,19 +29,6 @@ std::string OID::fmt()
     return out;
 }
 
-const git_oid *OID::from_sexp(SEXP s)
-{
-    Rcpp::Function x = Rcpp::Environment::namespace_env("guitar")[".extractPointer"];
-    Rcpp::XPtr<OID> oid_ptr(x(s));
-    const git_oid *oidp2 = static_cast<const git_oid*>(*oid_ptr);
-    return oidp2;
-}
-
-Rcpp::Reference OID::create(const git_oid *oid)
-{
-    return Rcpp::internal::make_new_object(new OID(oid));
-}
-
 RCPP_MODULE(guitar_oid) {
     using namespace Rcpp;
     class_<OID>("OID")

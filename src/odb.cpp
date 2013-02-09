@@ -5,17 +5,6 @@
 
 /******************************************************************************/
 
-// The code below ICEs g++ on OS X 10.8.2.
-//
-// // ptr extracts the .pointer fiels from the c++-derived class
-
-template <typename T> Rcpp::XPtr<T> ptr(SEXP s)
-{
-    Rcpp::Function extractor = Rcpp::Environment::namespace_env("guitar")[".extractPointer"];
-    SEXP s2 = extractor(s);
-    return Rcpp::XPtr<T>(s2);
-}
-
 ODB::ODB(git_odb *_odb)
 {
     odb = boost::shared_ptr<git_odb>(_odb, _git_odb_free);
@@ -23,7 +12,6 @@ ODB::ODB(git_odb *_odb)
 
 bool ODB::exists(SEXP s)
 {
-    Rcpp::XPtr<OID> p(ptr<OID>(s));
     return _git_odb_exists(odb.get(), OID::from_sexp(s));
 }
 

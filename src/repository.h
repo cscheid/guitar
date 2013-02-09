@@ -1,12 +1,13 @@
 #pragma once
 
-#include <RcppCommon.h>
-#include <Rcpp.h>
+#include <boost/shared_ptr.hpp>
+
+#include "guitar.h"
 #include "reference.h"
 
 /******************************************************************************/
 
-class Repository
+class Repository: public CPPWrapperObjectTraits<Repository, git_repository>
 {
 public:
     explicit Repository(std::string path);
@@ -46,6 +47,8 @@ public:
     Rcpp::Reference reference_lookup(std::string name); // returns a GitReference object
     Rcpp::Reference name_to_id(std::string name); // returns a OID object
     SEXP reference_list(unsigned int flags); // returns a list of characters
+
+    git_repository *unwrap() { return repo.get(); }
 
 protected:
     boost::shared_ptr<git_repository> repo;

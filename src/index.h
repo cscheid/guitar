@@ -1,11 +1,9 @@
 #pragma once
 
-#include <RcppCommon.h>
-#include <Rcpp.h>
-#include <git2.h>
+#include "guitar.h"
 #include <boost/shared_ptr.hpp>
 
-class Index
+class Index: public CPPWrapperObjectTraits<Index, git_index>
 {
 public:
     explicit Index(git_index *_ix); 
@@ -58,6 +56,7 @@ public:
     //                                    int their_mode, git_oid *their_id);
     // GIT_EXTERN(int) git_index_reuc_remove(git_index *index, size_t n);
 
+    git_index *unwrap() { return ix.get(); }
 
 protected:
     boost::shared_ptr<git_index> ix;
