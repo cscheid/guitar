@@ -95,6 +95,45 @@ SEXP Repository::reference_list(unsigned int flags)
     END_RCPP
 }
 
+Rcpp::Reference Repository::object_lookup(SEXP soid, int otype)
+{
+    BEGIN_RCPP
+    const git_oid *oid = OID::from_sexp(soid);
+    git_otype type = (git_otype) otype;
+    git_object *obj;
+    int err = _git_object_lookup(&obj, repo.get(), oid, type);
+    if (err) {
+        throw Rcpp::exception("git_object_lookup failed");
+    }
+
+    git_otype result_type = _git_object_type(obj);
+    
+    switch (result_type) {
+    case GIT_OBJ_COMMIT:
+        return R_NilValue;
+        break;
+    case GIT_OBJ_TREE:
+        return R_NilValue;
+        break;
+    case GIT_OBJ_BLOB:
+        return R_NilValue;
+        break;
+    case GIT_OBJ_TAG:
+        return R_NilValue;
+        break;
+    case GIT_OBJ_OFS_DELTA:
+        return R_NilValue;
+        break;
+    case GIT_OBJ_REF_DELTA:
+        return R_NilValue;
+        break;
+    default:
+        throw Rcpp::exception("Bad object type");
+    }
+    
+    END_RCPP
+}
+
 RCPP_MODULE(guitar_repository) {
     using namespace Rcpp;
     class_<Repository>("Repository")
@@ -105,6 +144,7 @@ RCPP_MODULE(guitar_repository) {
         .method("odb", &Repository::odb)
         .method("workdir", &Repository::workdir)
         .method("reference_lookup", &Repository::reference_lookup)
+        .method("object_lookup", &Repository::object_lookup)
         .method("name_to_id", &Repository::name_to_id)
         .method("reference_list", &Repository::reference_list)
         ;

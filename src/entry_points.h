@@ -205,11 +205,41 @@ extern int (*_git_odb_write_pack)(
 	void *progress_payload);
 extern int (*_git_odb_hash)(git_oid *out, const void *data, size_t len, git_otype type);
 extern int (*_git_odb_hashfile)(git_oid *out, const char *path, git_otype type);
+
+// odb_object
+
 extern void (*_git_odb_object_free)(git_odb_object *object);
 extern const git_oid * (*_git_odb_object_id)(git_odb_object *object);
 extern const void * (*_git_odb_object_data)(git_odb_object *object);
 extern size_t (*_git_odb_object_size)(git_odb_object *object);
 extern git_otype (*_git_odb_object_type)(git_odb_object *object);
+
+// object
+
+extern int (*_git_object_lookup)(
+   git_object **object,
+   git_repository *repo,
+   const git_oid *id,
+   git_otype type);
+extern int (*_git_object_lookup_prefix)(
+   git_object **object_out,
+   git_repository *repo,
+   const git_oid *id,
+   size_t len,
+   git_otype type);
+extern const git_oid * (*_git_object_id)(const git_object *obj);
+extern git_otype (*_git_object_type)(const git_object *obj);
+extern git_repository * (*_git_object_owner)(const git_object *obj);
+extern void (*_git_object_free)(git_object *object);
+extern const char * (*_git_object_type2string)(git_otype type);
+extern git_otype (*_git_object_string2type)(const char *str);
+extern int (*_git_object_typeisloose)(git_otype type);
+extern size_t (*_git_object__size)(git_otype type);
+extern int (*_git_object_peel)(
+	git_object **peeled,
+	const git_object *object,
+	git_otype target_type);
+
 
 /******************************************************************************/
 

@@ -214,11 +214,39 @@ int (*_git_odb_write_pack)(
 int (*_git_odb_hash)(git_oid *out, const void *data, size_t len, git_otype type);
 int (*_git_odb_hashfile)(git_oid *out, const char *path, git_otype type);
 void (*_git_odb_object_free)(git_odb_object *object);
+
+// odb_object
+
 const git_oid * (*_git_odb_object_id)(git_odb_object *object);
 const void * (*_git_odb_object_data)(git_odb_object *object);
 size_t (*_git_odb_object_size)(git_odb_object *object);
 git_otype (*_git_odb_object_type)(git_odb_object *object);
 
+// object
+
+int (*_git_object_lookup)(
+   git_object **object,
+   git_repository *repo,
+   const git_oid *id,
+   git_otype type);
+int (*_git_object_lookup_prefix)(
+   git_object **object_out,
+   git_repository *repo,
+   const git_oid *id,
+   size_t len,
+   git_otype type);
+const git_oid * (*_git_object_id)(const git_object *obj);
+git_otype (*_git_object_type)(const git_object *obj);
+git_repository * (*_git_object_owner)(const git_object *obj);
+void (*_git_object_free)(git_object *object);
+const char * (*_git_object_type2string)(git_otype type);
+git_otype (*_git_object_string2type)(const char *str);
+int (*_git_object_typeisloose)(git_otype type);
+size_t (*_git_object__size)(git_otype type);
+int (*_git_object_peel)(
+	git_object **peeled,
+	const git_object *object,
+	git_otype target_type);
 
 
 /******************************************************************************/
@@ -429,12 +457,37 @@ SEXP load_library()
                                    void *progress_payload)) dlsym_warn(result, "git_odb_write_pack");
     _git_odb_hash = (int (*)(git_oid *out, const void *data, size_t len, git_otype type)) dlsym_warn(result, "git_odb_hash");
     _git_odb_hashfile = (int (*)(git_oid *out, const char *path, git_otype type)) dlsym_warn(result, "git_odb_hashfile");
+
     _git_odb_object_free = (void (*)(git_odb_object *object)) dlsym_warn(result, "git_odb_object_free");
     _git_odb_object_id = (const git_oid * (*)(git_odb_object *object)) dlsym_warn(result, "git_odb_object_id");
     _git_odb_object_data = (const void * (*)(git_odb_object *object)) dlsym_warn(result, "git_odb_object_data");
     _git_odb_object_size = (size_t (*)(git_odb_object *object)) dlsym_warn(result, "git_odb_object_size");
     _git_odb_object_type = (git_otype (*)(git_odb_object *object)) dlsym_warn(result, "git_odb_object_type");
 
+    _git_object_lookup = (int (*)(
+   git_object **object,
+   git_repository *repo,
+   const git_oid *id,
+   git_otype type)) dlsym_warn(result, "git_object_lookup");
+    _git_object_lookup_prefix = (int (*)(
+   git_object **object_out,
+   git_repository *repo,
+   const git_oid *id,
+   size_t len,
+   git_otype type)) dlsym_warn(result, "git_object_lookup_prefix");
+    _git_object_id = (const git_oid * (*)(const git_object *obj)) dlsym_warn(result, "git_object_id");
+    _git_object_type = (git_otype (*)(const git_object *obj)) dlsym_warn(result, "git_object_type");
+    _git_object_owner = (git_repository * (*)(const git_object *obj)) dlsym_warn(result, "git_object_owner");
+    _git_object_free = (void (*)(git_object *object)) dlsym_warn(result, "git_object_free");
+    _git_object_type2string = (const char * (*)(git_otype type)) dlsym_warn(result, "git_object_type2string");
+    _git_object_string2type = (git_otype (*)(const char *str)) dlsym_warn(result, "git_object_string2type");
+    _git_object_typeisloose = (int (*)(git_otype type)) dlsym_warn(result, "git_object_typeisloose");
+    _git_object__size = (size_t (*)(git_otype type)) dlsym_warn(result, "git_object__size");
+    _git_object_peel = (int (*)(
+	git_object **peeled,
+	const git_object *object,
+	git_otype target_type)) dlsym_warn(result, "git_object_peel");
+    
     return Rcpp::LogicalVector::create(true);
     END_RCPP
 }
