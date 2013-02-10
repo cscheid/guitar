@@ -38,9 +38,11 @@ static int list_cb(const git_oid *id, void *payload)
 
 Rcpp::List ODB::list()
 {
+    BEGIN_RCPP
     Rcpp::List v;
     _git_odb_foreach(odb.get(), &list_cb, &v);
     return v;
+    END_RCPP
 }
 
 Rcpp::Reference ODB::read(SEXP s)

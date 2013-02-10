@@ -17,6 +17,16 @@ public:
     SEXP author();
     int type();
 
+    unsigned int parent_count();
+
+    // these load the commits from the db
+    Rcpp::Reference parent(unsigned int n);
+    Rcpp::List parent_list();
+
+    // these don't
+    Rcpp::Reference parent_id(unsigned int n);
+    Rcpp::List parent_id_list();
+
     git_commit *unwrap() const { return commit.get(); }
 
 protected:

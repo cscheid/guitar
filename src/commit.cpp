@@ -60,6 +60,54 @@ int Commit::type()
     return _git_object_type((git_object*)commit.get());
 }
 
+unsigned int Commit::parent_count()
+{
+    return _git_commit_parentcount(commit.get());
+}
+
+Rcpp::Reference Commit::parent(unsigned int n)
+{
+    BEGIN_RCPP
+    git_commit *result;
+    int err = _git_commit_parent(&result, commit.get(), n);
+    if (err)
+        throw Rcpp::exception("bad parent number");
+    return Commit::create(result);
+    END_RCPP
+}
+
+Rcpp::List Commit::parent_list()
+{
+    BEGIN_RCPP
+    Rcpp::List v;
+    unsigned int c = parent_count();
+    for (int i=0; i<c; ++i) {
+        v.push_back(parent(i));
+    }
+    return v;
+    END_RCPP
+}
+
+Rcpp::Reference Commit::parent_id(unsigned int n)
+{
+    BEGIN_RCPP
+    const git_oid *result = _git_commit_parent_id(commit.get(), n);
+    return OID::create(result);
+    END_RCPP
+}
+
+Rcpp::List Commit::parent_id_list()
+{
+    BEGIN_RCPP
+    Rcpp::List v;
+    unsigned int c = parent_count();
+    for (int i=0; i<c; ++i) {
+        v.push_back(parent_id(i));
+    }
+    return v;
+    END_RCPP
+}
+
 RCPP_MODULE(guitar_commit) {
     using namespace Rcpp;
     class_<Commit>("Commit")
@@ -67,8 +115,13 @@ RCPP_MODULE(guitar_commit) {
         .method("message_encoding", &Commit::message_encoding)
         .method("message", &Commit::message)
         .method("time", &Commit::time)
-        .method("type", &Commit::type)
         .method("committer", &Commit::committer)
         .method("author", &Commit::author)
+        .method("type", &Commit::type)
+        .method("parent_count", &Commit::parent_count)
+        .method("parent", &Commit::parent)
+        .method("parent_list", &Commit::parent_list)
+        .method("parent_id", &Commit::parent_id)
+        .method("parent_id_list", &Commit::parent_id_list)
         ;
 }
