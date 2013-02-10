@@ -274,6 +274,59 @@ int (*_git_commit_create)(
  	int parent_count,
         const git_commit *parents[]);
 
+// tree
+
+const git_oid * (*_git_tree_id)(const git_tree *tree);
+git_repository * (*_git_tree_owner)(const git_tree *tree);
+size_t (*_git_tree_entrycount)(const git_tree *tree);
+const git_tree_entry * (*_git_tree_entry_byname)(
+	git_tree *tree, const char *filename);
+const git_tree_entry * (*_git_tree_entry_byindex)(
+	git_tree *tree, size_t idx);
+const git_tree_entry * (*_git_tree_entry_byoid)(
+	const git_tree *tree, const git_oid *oid);
+int (*_git_tree_entry_bypath)(
+	git_tree_entry **out,
+	git_tree *root,
+	const char *path);
+git_tree_entry * (*_git_tree_entry_dup)(const git_tree_entry *entry);
+void (*_git_tree_entry_free)(git_tree_entry *entry);
+const char * (*_git_tree_entry_name)(const git_tree_entry *entry);
+const git_oid * (*_git_tree_entry_id)(const git_tree_entry *entry);
+git_otype (*_git_tree_entry_type)(const git_tree_entry *entry);
+git_filemode_t (*_git_tree_entry_filemode)(const git_tree_entry *entry);
+int (*_git_tree_entry_cmp)(const git_tree_entry *e1, const git_tree_entry *e2);
+int (*_git_tree_entry_to_object)(
+	git_object **object_out,
+	git_repository *repo,
+	const git_tree_entry *entry);
+int (*_git_treebuilder_create)(
+	git_treebuilder **out, const git_tree *source);
+void (*_git_treebuilder_clear)(git_treebuilder *bld);
+unsigned int (*_git_treebuilder_entrycount)(git_treebuilder *bld);
+void (*_git_treebuilder_free)(git_treebuilder *bld);
+const git_tree_entry * (*_git_treebuilder_get)(
+	git_treebuilder *bld, const char *filename);
+int (*_git_treebuilder_insert)(
+	const git_tree_entry **out,
+	git_treebuilder *bld,
+	const char *filename,
+	const git_oid *id,
+	git_filemode_t filemode);
+int (*_git_treebuilder_remove)(
+	git_treebuilder *bld, const char *filename);
+void (*_git_treebuilder_filter)(
+	git_treebuilder *bld,
+	git_treebuilder_filter_cb filter,
+	void *payload);
+int (*_git_treebuilder_write)(
+	git_oid *id, git_repository *repo, git_treebuilder *bld);
+int (*_git_tree_walk)(
+	const git_tree *tree,
+	git_treewalk_mode mode,
+	git_treewalk_cb callback,
+	void *payload);
+
 
 /******************************************************************************/
 // function 
@@ -540,6 +593,56 @@ SEXP load_library()
  	int parent_count,
         const git_commit *parents[])) dlsym_warn(result, "git_commit_create");
 
+    _git_tree_id = (const git_oid * (*)(const git_tree *tree)) dlsym_warn(result, "git_tree_id");
+    _git_tree_owner = (git_repository * (*)(const git_tree *tree)) dlsym_warn(result, "git_tree_owner");
+    _git_tree_entrycount = (size_t (*)(const git_tree *tree)) dlsym_warn(result, "git_tree_entrycount");
+    _git_tree_entry_byname = (const git_tree_entry * (*)(
+                                                         git_tree *tree, const char *filename)) dlsym_warn(result, "git_tree_entry_byname");
+    _git_tree_entry_byindex = (const git_tree_entry * (*)(
+                                                          git_tree *tree, size_t idx)) dlsym_warn(result, "git_tree_entry_byindex");
+    _git_tree_entry_byoid = (const git_tree_entry * (*)(
+                                                        const git_tree *tree, const git_oid *oid)) dlsym_warn(result, "git_tree_entry_byoid");
+    _git_tree_entry_bypath = (int (*)(
+	git_tree_entry **out,
+	git_tree *root,
+	const char *path)) dlsym_warn(result, "git_tree_entry_bypath");
+    _git_tree_entry_dup = (git_tree_entry * (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_dup");
+    _git_tree_entry_free = (void (*)(git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_free");
+    _git_tree_entry_name = (const char * (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_name");
+    _git_tree_entry_id = (const git_oid * (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_id");
+    _git_tree_entry_type = (git_otype (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_type");
+    _git_tree_entry_filemode = (git_filemode_t (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_filemode");
+    _git_tree_entry_cmp = (int (*)(const git_tree_entry *e1, const git_tree_entry *e2)) dlsym_warn(result, "git_tree_entry_cmp");
+    _git_tree_entry_to_object = (int (*)(
+	git_object **object_out,
+	git_repository *repo,
+	const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_to_object");
+    _git_treebuilder_create = (int (*)(
+                                       git_treebuilder **out, const git_tree *source)) dlsym_warn(result, "git_treebuilder_create");
+    _git_treebuilder_clear = (void (*)(git_treebuilder *bld)) dlsym_warn(result, "git_treebuilder_clear");
+    _git_treebuilder_entrycount = (unsigned int (*)(git_treebuilder *bld)) dlsym_warn(result, "git_treebuilder_entrycount");
+    _git_treebuilder_free = (void (*)(git_treebuilder *bld)) dlsym_warn(result, "git_treebuilder_free");
+    _git_treebuilder_get = (const git_tree_entry * (*)(
+                                                       git_treebuilder *bld, const char *filename)) dlsym_warn(result, "git_treebuilder_get");
+    _git_treebuilder_insert = (int (*)(
+	const git_tree_entry **out,
+	git_treebuilder *bld,
+	const char *filename,
+	const git_oid *id,
+	git_filemode_t filemode)) dlsym_warn(result, "git_treebuilder_insert");
+    _git_treebuilder_remove = (int (*)(
+                                       git_treebuilder *bld, const char *filename)) dlsym_warn(result, "git_treebuilder_remove");
+    _git_treebuilder_filter = (void (*)(
+	git_treebuilder *bld,
+	git_treebuilder_filter_cb filter,
+	void *payload)) dlsym_warn(result, "git_treebuilder_filter");
+    _git_treebuilder_write = (int (*)(
+                                      git_oid *id, git_repository *repo, git_treebuilder *bld)) dlsym_warn(result, "git_treebuilder_write");
+    _git_tree_walk = (int (*)(
+	const git_tree *tree,
+	git_treewalk_mode mode,
+	git_treewalk_cb callback,
+	void *payload)) dlsym_warn(result, "git_tree_walk");
 
     return Rcpp::LogicalVector::create(true);
     END_RCPP

@@ -28,3 +28,5 @@ struct CPPWrapperObjectTraits {
         return Rcpp::internal::make_new_object(new Self(obj));
     };
 };
+
+SEXP object_to_sexp(git_object *obj);
