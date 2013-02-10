@@ -2,6 +2,7 @@
 #include "entry_points.h"
 #include "commit.h"
 #include "tree.h"
+#include "blob.h"
 
 using namespace Rcpp;
 
@@ -18,11 +19,12 @@ SEXP object_to_sexp(git_object *obj)
         git_tree *tree = (git_tree *)obj;
         return Tree::create(tree);
     } break;
+    case GIT_OBJ_BLOB: {
+        git_blob *blob = (git_blob *)obj;
+        return Blob::create(blob);
+    } break;
     default:
         return R_NilValue;
-    // case GIT_OBJ_BLOB:
-    //     return R_NilValue;
-    //     break;
     // case GIT_OBJ_TAG:
     //     return R_NilValue;
     //     break;

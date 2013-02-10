@@ -327,6 +327,21 @@ int (*_git_tree_walk)(
 	git_treewalk_cb callback,
 	void *payload);
 
+// blob
+
+const void * (*_git_blob_rawcontent)(const git_blob *blob);
+git_off_t (*_git_blob_rawsize)(const git_blob *blob);
+int (*_git_blob_create_fromworkdir)(git_oid *id, git_repository *repo, const char *relative_path);
+int (*_git_blob_create_fromdisk)(git_oid *id, git_repository *repo, const char *path);
+int (*_git_blob_create_fromchunks)(
+ git_oid *id,
+ git_repository *repo,
+ const char *hintpath,
+ git_blob_chunk_cb callback,
+ void *payload);
+int (*_git_blob_create_frombuffer)(git_oid *oid, git_repository *repo, const void *buffer, size_t len);
+int (*_git_blob_is_binary)(git_blob *blob);
+
 
 /******************************************************************************/
 // function 
@@ -643,6 +658,19 @@ SEXP load_library()
 	git_treewalk_mode mode,
 	git_treewalk_cb callback,
 	void *payload)) dlsym_warn(result, "git_tree_walk");
+
+    _git_blob_rawcontent = (const void * (*)(const git_blob *blob)) dlsym_warn(result, "git_blob_rawcontent");
+    _git_blob_rawsize = (git_off_t (*)(const git_blob *blob)) dlsym_warn(result, "git_blob_rawsize");
+    _git_blob_create_fromworkdir = (int (*)(git_oid *id, git_repository *repo, const char *relative_path)) dlsym_warn(result, "git_blob_create_fromworkdir");
+    _git_blob_create_fromdisk = (int (*)(git_oid *id, git_repository *repo, const char *path)) dlsym_warn(result, "git_blob_create_fromdisk");
+    _git_blob_create_fromchunks = (int (*)(
+ git_oid *id,
+ git_repository *repo,
+ const char *hintpath,
+ git_blob_chunk_cb callback,
+ void *payload)) dlsym_warn(result, "git_blob_create_fromchunks");
+    _git_blob_create_frombuffer = (int (*)(git_oid *oid, git_repository *repo, const void *buffer, size_t len)) dlsym_warn(result, "git_blob_create_frombuffer");
+    _git_blob_is_binary = (int (*)(git_blob *blob)) dlsym_warn(result, "git_blob_is_binary");
 
     return Rcpp::LogicalVector::create(true);
     END_RCPP

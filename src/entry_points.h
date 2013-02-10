@@ -322,6 +322,21 @@ extern int (*_git_tree_walk)(
 	git_treewalk_cb callback,
 	void *payload);
 
+// blob
+
+extern const void * (*_git_blob_rawcontent)(const git_blob *blob);
+extern git_off_t (*_git_blob_rawsize)(const git_blob *blob);
+extern int (*_git_blob_create_fromworkdir)(git_oid *id, git_repository *repo, const char *relative_path);
+extern int (*_git_blob_create_fromdisk)(git_oid *id, git_repository *repo, const char *path);
+extern int (*_git_blob_create_fromchunks)(
+	git_oid *id,
+	git_repository *repo,
+	const char *hintpath,
+	git_blob_chunk_cb callback,
+	void *payload);
+extern int (*_git_blob_create_frombuffer)(git_oid *oid, git_repository *repo, const void *buffer, size_t len);
+extern int (*_git_blob_is_binary)(git_blob *blob);
+
 /******************************************************************************/
 
 RcppExport SEXP load_library();
