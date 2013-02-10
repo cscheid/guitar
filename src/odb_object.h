@@ -10,6 +10,7 @@ class ODBObject: public CPPWrapperObjectTraits<ODBObject, git_odb_object>
 public:
     explicit ODBObject(git_odb_object *_obj);
 
+    size_t size();
     Rcpp::RawVector data();
     unsigned int type();
     Rcpp::Reference id();

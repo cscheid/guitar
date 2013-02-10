@@ -10,6 +10,11 @@ ODBObject::ODBObject(git_odb_object *_obj)
     obj = boost::shared_ptr<git_odb_object>(_obj, _git_odb_object_free);
 }
 
+size_t ODBObject::size()
+{
+    return _git_odb_object_size(obj.get());
+}
+
 Rcpp::RawVector ODBObject::data()
 {
     BEGIN_RCPP
