@@ -1,6 +1,7 @@
 #include "odb_object.h"
 #include "entry_points.h"
 #include <algorithm>
+#include "oid.h"
 
 /******************************************************************************/
 
@@ -22,9 +23,21 @@ Rcpp::RawVector ODBObject::data()
     END_RCPP
 }
 
+unsigned int ODBObject::type()
+{
+    return _git_odb_object_type(obj.get());
+}
+
+Rcpp::Reference ODBObject::id()
+{
+    return OID::create(_git_odb_object_id(obj.get()));
+}
+
 RCPP_MODULE(guitar_odb_object) {
     using namespace Rcpp;
     class_<ODBObject>("ODBObject")
         .method("data", &ODBObject::data)
+        .method("type", &ODBObject::type)
+        .method("id", &ODBObject::id)
         ;
 }

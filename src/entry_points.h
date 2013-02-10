@@ -240,6 +240,34 @@ extern int (*_git_object_peel)(
 	const git_object *object,
 	git_otype target_type);
 
+// commit
+
+extern const char * (*_git_commit_message_encoding)(const git_commit *commit);
+extern const char * (*_git_commit_message)(const git_commit *commit);
+extern git_time_t (*_git_commit_time)(const git_commit *commit);
+extern int (*_git_commit_time_offset)(const git_commit *commit);
+extern const git_signature * (*_git_commit_committer)(const git_commit *commit);
+extern const git_signature * (*_git_commit_author)(const git_commit *commit);
+extern int (*_git_commit_tree)(git_tree **tree_out, const git_commit *commit);
+extern const git_oid * (*_git_commit_tree_id)(const git_commit *commit);
+extern unsigned int (*_git_commit_parentcount)(const git_commit *commit);
+extern int (*_git_commit_parent)(git_commit **out, git_commit *commit, unsigned int n);
+extern const git_oid * (*_git_commit_parent_id)(git_commit *commit, unsigned int n);
+extern int (*_git_commit_nth_gen_ancestor)(
+	git_commit **ancestor,
+	const git_commit *commit,
+	unsigned int n);
+extern int (*_git_commit_create)(
+		git_oid *id,
+		git_repository *repo,
+		const char *update_ref,
+		const git_signature *author,
+		const git_signature *committer,
+		const char *message_encoding,
+		const char *message,
+		const git_tree *tree,
+		int parent_count,
+		const git_commit *parents[]);
 
 /******************************************************************************/
 

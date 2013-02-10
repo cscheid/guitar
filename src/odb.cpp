@@ -1,7 +1,6 @@
 #include "odb.h"
 #include "entry_points.h"
 #include "odb_object.h"
-#include <cstdio>
 
 /******************************************************************************/
 

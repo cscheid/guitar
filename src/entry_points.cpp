@@ -248,6 +248,32 @@ int (*_git_object_peel)(
 	const git_object *object,
 	git_otype target_type);
 
+const char * (*_git_commit_message_encoding)(const git_commit *commit);
+const char * (*_git_commit_message)(const git_commit *commit);
+git_time_t (*_git_commit_time)(const git_commit *commit);
+int (*_git_commit_time_offset)(const git_commit *commit);
+const git_signature * (*_git_commit_committer)(const git_commit *commit);
+const git_signature * (*_git_commit_author)(const git_commit *commit);
+int (*_git_commit_tree)(git_tree **tree_out, const git_commit *commit);
+const git_oid * (*_git_commit_tree_id)(const git_commit *commit);
+unsigned int (*_git_commit_parentcount)(const git_commit *commit);
+int (*_git_commit_parent)(git_commit **out, git_commit *commit, unsigned int n);
+const git_oid * (*_git_commit_parent_id)(git_commit *commit, unsigned int n);
+int (*_git_commit_nth_gen_ancestor)(git_commit **ancestor,
+                                    const git_commit *commit,
+                                    unsigned int n);
+int (*_git_commit_create)(
+ 	git_oid *id,
+ 	git_repository *repo,
+ 	const char *update_ref,
+ 	const git_signature *author,
+ 	const git_signature *committer,
+ 	const char *message_encoding,
+ 	const char *message,
+ 	const git_tree *tree,
+ 	int parent_count,
+        const git_commit *parents[]);
+
 
 /******************************************************************************/
 // function 
@@ -487,7 +513,34 @@ SEXP load_library()
 	git_object **peeled,
 	const git_object *object,
 	git_otype target_type)) dlsym_warn(result, "git_object_peel");
-    
+
+    _git_commit_message_encoding = (const char * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_message_encoding");
+    _git_commit_message = (const char * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_message");
+    _git_commit_time = (git_time_t (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_time");
+    _git_commit_time_offset = (int (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_time_offset");
+    _git_commit_committer = (const git_signature * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_committer");
+    _git_commit_author = (const git_signature * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_author");
+    _git_commit_tree = (int (*)(git_tree **tree_out, const git_commit *commit)) dlsym_warn(result, "git_commit_tree");
+    _git_commit_tree_id = (const git_oid * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_tree_id");
+    _git_commit_parentcount = (unsigned int (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_parentcount");
+    _git_commit_parent = (int (*)(git_commit **out, git_commit *commit, unsigned int n)) dlsym_warn(result, "git_commit_parent");
+    _git_commit_parent_id = (const git_oid * (*)(git_commit *commit, unsigned int n)) dlsym_warn(result, "git_commit_parent_id");
+    _git_commit_nth_gen_ancestor = (int (*)(git_commit **ancestor,
+                                    const git_commit *commit,
+                                            unsigned int n)) dlsym_warn(result, "git_commit_nth_gen_ancestor");
+    _git_commit_create = (int (*)(
+ 	git_oid *id,
+ 	git_repository *repo,
+ 	const char *update_ref,
+ 	const git_signature *author,
+ 	const git_signature *committer,
+ 	const char *message_encoding,
+ 	const char *message,
+ 	const git_tree *tree,
+ 	int parent_count,
+        const git_commit *parents[])) dlsym_warn(result, "git_commit_create");
+
+
     return Rcpp::LogicalVector::create(true);
     END_RCPP
 }

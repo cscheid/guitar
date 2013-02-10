@@ -4,6 +4,7 @@
 #include "reference.h"
 #include "oid.h"
 #include "odb.h"
+#include "commit.h"
 
 /******************************************************************************/
 
@@ -95,7 +96,7 @@ SEXP Repository::reference_list(unsigned int flags)
     END_RCPP
 }
 
-Rcpp::Reference Repository::object_lookup(SEXP soid, int otype)
+SEXP Repository::object_lookup(SEXP soid, int otype)
 {
     BEGIN_RCPP
     const git_oid *oid = OID::from_sexp(soid);
@@ -109,26 +110,29 @@ Rcpp::Reference Repository::object_lookup(SEXP soid, int otype)
     git_otype result_type = _git_object_type(obj);
     
     switch (result_type) {
-    case GIT_OBJ_COMMIT:
-        return R_NilValue;
-        break;
-    case GIT_OBJ_TREE:
-        return R_NilValue;
-        break;
-    case GIT_OBJ_BLOB:
-        return R_NilValue;
-        break;
-    case GIT_OBJ_TAG:
-        return R_NilValue;
-        break;
-    case GIT_OBJ_OFS_DELTA:
-        return R_NilValue;
-        break;
-    case GIT_OBJ_REF_DELTA:
-        return R_NilValue;
-        break;
+    case GIT_OBJ_COMMIT: {
+        git_commit *commit = (git_commit *)obj;
+        return Commit::create(commit);
+    } break;
     default:
-        throw Rcpp::exception("Bad object type");
+        return R_NilValue;
+    // case GIT_OBJ_TREE:
+    //     return R_NilValue;
+    //     break;
+    // case GIT_OBJ_BLOB:
+    //     return R_NilValue;
+    //     break;
+    // case GIT_OBJ_TAG:
+    //     return R_NilValue;
+    //     break;
+    // case GIT_OBJ_OFS_DELTA:
+    //     return R_NilValue;
+    //     break;
+    // case GIT_OBJ_REF_DELTA:
+    //     return R_NilValue;
+    //     break;
+    // default:
+    //     throw Rcpp::exception("Bad object type");
     }
     
     END_RCPP

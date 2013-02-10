@@ -11,6 +11,8 @@ public:
     explicit ODBObject(git_odb_object *_obj);
 
     Rcpp::RawVector data();
+    unsigned int type();
+    Rcpp::Reference id();
 
     git_odb_object *unwrap() { return obj.get(); }
 

@@ -50,7 +50,7 @@ public:
 
     // returns a Commit, Tree, Blog, Tar, OffsetDelta or ReferenceDelta objects
     // (that is, one of the subclasses of git_object)
-    Rcpp::Reference object_lookup(SEXP oid, int otype);
+    SEXP object_lookup(SEXP oid, int otype);
 
     git_repository *unwrap() { return repo.get(); }
 
