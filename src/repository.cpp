@@ -22,6 +22,15 @@ Repository::Repository(std::string path)
     repo = boost::shared_ptr<git_repository>(_repo, _git_repository_free);
 }
 
+Rcpp::Reference Repository::hash_file(std::string path, int type)
+{
+    git_oid out;
+    int err = _git_repository_hashfile(&out, repo.get(), path.c_str(), (git_otype) type, path.c_str());
+    if (err)
+        throw Rcpp::exception("hash_file failed");
+    return OID::create(&out);
+}
+
 Rcpp::Reference Repository::head()
 {
     git_reference *ref;
@@ -32,6 +41,11 @@ Rcpp::Reference Repository::head()
 bool Repository::head_detached()
 {
     return _git_repository_head_detached(repo.get());
+}
+
+bool Repository::head_orphan()
+{
+    return _git_repository_head_orphan(repo.get());
 }
 
 Rcpp::Reference Repository::index()
@@ -60,6 +74,31 @@ Rcpp::Reference Repository::odb()
         throw Rcpp::exception("Repository::odb error");
     return Rcpp::internal::make_new_object(new ODB(odb));
     END_RCPP
+}
+
+std::string Repository::path()
+{
+    return std::string(_git_repository_path(repo.get()));
+}
+
+void Repository::set_head(std::string refname)
+{
+    int err = _git_repository_set_head(repo.get(), refname.c_str());
+    if (err)
+        throw Rcpp::exception("set_head failed");
+}
+
+void Repository::set_head_detached(SEXP _oid)
+{
+    const git_oid *oid = OID::from_sexp(_oid);
+    int err = _git_repository_set_head_detached(repo.get(), oid);
+    if (err)
+        throw Rcpp::exception("set_head detached failed");
+}
+
+int Repository::state()
+{
+    return _git_repository_state(repo.get());
 }
 
 std::string Repository::workdir()
@@ -140,12 +179,18 @@ RCPP_MODULE(guitar_repository) {
     using namespace Rcpp;
     class_<Repository>("Repository")
         .constructor<std::string>()
+        .method("hash_file", &Repository::hash_file)
         .method("head", &Repository::head)
         .method("head_detached", &Repository::head_detached)
+        .method("head_orphan", &Repository::head_orphan)
         .method("index", &Repository::index)
         .method("is_bare", &Repository::is_bare)
         .method("is_empty", &Repository::is_empty)
         .method("odb", &Repository::odb)
+        .method("path", &Repository::path)
+        .method("set_head", &Repository::set_head)
+        .method("set_head_detached", &Repository::set_head_detached)
+        .method("state", &Repository::state)
         .method("workdir", &Repository::workdir)
         .method("reference_lookup", &Repository::reference_lookup)
         .method("object_lookup", &Repository::object_lookup)

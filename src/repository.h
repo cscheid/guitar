@@ -17,12 +17,10 @@ public:
     // git_repository_detach_head,
     // git_repository_discover,
     // git_repository_fetchhead_foreach,
-    // git_repository_free,
-    // git_repository_hashfile,
+    Rcpp::Reference hash_file(std::string path, int type); // git_repository_hashfile,
     Rcpp::Reference head();
     bool head_detached();
-    // git_repository_head_detached,
-    // git_repository_head_orphan,
+    bool head_orphan();
     Rcpp::Reference index();
     // git_repository_init_ext,
     bool is_bare();
@@ -32,15 +30,15 @@ public:
     // git_repository_message,
     // git_repository_message_remove,
     Rcpp::Reference odb();
-    // git_repository_open,
     // git_repository_open_ext,
-    // git_repository_path,
+    std::string path();
     // git_repository_set_config,
-    // git_repository_set_head,
-    // git_repository_set_head_detached,
+    void set_head(std::string refname);
+    void set_head_detached(SEXP oid);
     // git_repository_set_index,
     // git_repository_set_odb,
     // git_repository_set_workdir,
+    int state();
     // git_repository_state,
     std::string workdir();
     // git_repository_wrap_odb,
