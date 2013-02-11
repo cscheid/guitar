@@ -15,4 +15,5 @@ git_time Time::from_sexp(SEXP sexp)
     Rcpp::List l(sexp);
     result.time = l["time"];
     result.offset = l["offset"];
+    return result;
 }

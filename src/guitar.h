@@ -30,3 +30,8 @@ struct CPPWrapperObjectTraits {
 };
 
 SEXP object_to_sexp(git_object *obj);
+
+struct Signature {
+    static SEXP create(const git_signature *sig);
+    static git_signature from_sexp(SEXP s);
+};

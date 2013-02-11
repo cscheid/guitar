@@ -110,7 +110,6 @@ SEXP TreeEntry::object(SEXP _repo)
         throw Rcpp::exception("object lookup failed");
     return object_to_sexp(result);
     END_RCPP
-            
 }
 
 int TreeEntry::type()

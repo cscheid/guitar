@@ -3,6 +3,7 @@
 #include "commit.h"
 #include "tree.h"
 #include "blob.h"
+#include "time.h"
 
 using namespace Rcpp;
 
@@ -23,11 +24,11 @@ SEXP object_to_sexp(git_object *obj)
         git_blob *blob = (git_blob *)obj;
         return Blob::create(blob);
     } break;
+    case GIT_OBJ_TAG: {
+        return R_NilValue;
+    } break;
     default:
         return R_NilValue;
-    // case GIT_OBJ_TAG:
-    //     return R_NilValue;
-    //     break;
     // case GIT_OBJ_OFS_DELTA:
     //     return R_NilValue;
     //     break;
@@ -37,4 +38,16 @@ SEXP object_to_sexp(git_object *obj)
     // default:
     //     throw Rcpp::exception("Bad object type");
     }
+}
+
+SEXP Signature::create(const git_signature *signature)
+{
+    return Rcpp::List::create(Rcpp::Named("name") = std::string(signature->name),
+                              Rcpp::Named("email") = std::string(signature->email),
+                              Rcpp::Named("time") = Time::create(&signature->when));
+}
+
+git_signature Signature::from_sexp(SEXP sexp)
+{
+    throw Rcpp::exception("unimplemented");
 }

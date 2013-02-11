@@ -342,6 +342,51 @@ int (*_git_blob_create_fromchunks)(
 int (*_git_blob_create_frombuffer)(git_oid *oid, git_repository *repo, const void *buffer, size_t len);
 int (*_git_blob_is_binary)(git_blob *blob);
 
+// tag
+
+const git_oid * (*_git_tag_id)(const git_tag *tag);
+int (*_git_tag_target)(git_object **target_out, const git_tag *tag);
+const git_oid * (*_git_tag_target_id)(const git_tag *tag);
+git_otype (*_git_tag_target_type)(const git_tag *tag);
+const char * (*_git_tag_name)(const git_tag *tag);
+const git_signature * (*_git_tag_tagger)(const git_tag *tag);
+const char * (*_git_tag_message)(const git_tag *tag);
+int (*_git_tag_create)(
+                       git_oid *oid,
+                       git_repository *repo,
+                       const char *tag_name,
+                       const git_object *target,
+                       const git_signature *tagger,
+                       const char *message,
+                       int force);
+int (*_git_tag_create_frombuffer)(
+                                  git_oid *oid,
+                                  git_repository *repo,
+                                  const char *buffer,
+                                  int force);
+int (*_git_tag_create_lightweight)(
+                                   git_oid *oid,
+                                   git_repository *repo,
+                                   const char *tag_name,
+                                   const git_object *target,
+                                   int force);
+int (*_git_tag_delete)(
+                       git_repository *repo,
+                       const char *tag_name);
+int (*_git_tag_list)(
+                     git_strarray *tag_names,
+                     git_repository *repo);
+int (*_git_tag_list_match)(
+                           git_strarray *tag_names,
+                           const char *pattern,
+                           git_repository *repo);
+int (*_git_tag_foreach)(
+                        git_repository *repo,
+                        git_tag_foreach_cb callback,
+                        void *payload);
+int (*_git_tag_peel)(
+                     git_object **tag_target_out,
+                     const git_tag *tag);
 
 /******************************************************************************/
 // function 
@@ -368,19 +413,19 @@ SEXP load_library()
     _git_repository_open = (int (*)(git_repository **out, const char *path)) dlsym_warn(result, "git_repository_open");
     _git_repository_wrap_odb = (int (*)(git_repository **out, git_odb *odb)) dlsym_warn(result, "git_repository_wrap_odb");
     _git_repository_open_ext = (int (*)(
-	git_repository **out,
-	const char *path,
-	unsigned int flags,
-	const char *ceiling_dirs)) dlsym_warn(result, "git_repository_open_ext");
+                                        git_repository **out,
+                                        const char *path,
+                                        unsigned int flags,
+                                        const char *ceiling_dirs)) dlsym_warn(result, "git_repository_open_ext");
     _git_repository_free = (void (*)(git_repository *repo)) dlsym_warn(result, "git_repository_free");
     _git_repository_init = (int (*)(
-	git_repository **out,
-	const char *path,
-	unsigned is_bare)) dlsym_warn(result, "git_repository_init");
+                                    git_repository **out,
+                                    const char *path,
+                                    unsigned is_bare)) dlsym_warn(result, "git_repository_init");
     _git_repository_init_ext = (int (*)(
-	git_repository **out,
-	const char *repo_path,
-	git_repository_init_options *opts)) dlsym_warn(result, "git_repository_init_ext");
+                                        git_repository **out,
+                                        const char *repo_path,
+                                        git_repository_init_options *opts)) dlsym_warn(result, "git_repository_init_ext");
     _git_repository_head = (int (*)(git_reference **out, git_repository *repo)) dlsym_warn(result, "git_repository_head");
     _git_repository_head_detached = (int (*)(git_repository *repo)) dlsym_warn(result, "git_repository_head_detached");
     _git_repository_head_orphan = (int (*)(git_repository *repo)) dlsym_warn(result, "git_repository_head_orphan");
@@ -400,23 +445,23 @@ SEXP load_library()
     _git_repository_message_remove = (int (*)(git_repository *repo)) dlsym_warn(result, "git_repository_message_remove");
     _git_repository_merge_cleanup = (int (*)(git_repository *repo)) dlsym_warn(result, "git_repository_merge_cleanup");
     _git_repository_fetchhead_foreach = (int (*)(git_repository *repo,
-	git_repository_fetchhead_foreach_cb callback,
+                                                 git_repository_fetchhead_foreach_cb callback,
                                                  void *payload)) dlsym_warn(result, "git_repository_fetchhead_foreach");
     _git_repository_mergehead_foreach = (int (*)(git_repository *repo,
-	git_repository_mergehead_foreach_cb callback,
+                                                 git_repository_mergehead_foreach_cb callback,
                                                  void *payload)) dlsym_warn(result, "git_repository_mergehead_foreach");
     _git_repository_hashfile = (int (*)(
-    git_oid *out,
-    git_repository *repo,
-    const char *path,
-    git_otype type,
-    const char *as_path)) dlsym_warn(result, "git_repository_hashfile");
+                                        git_oid *out,
+                                        git_repository *repo,
+                                        const char *path,
+                                        git_otype type,
+                                        const char *as_path)) dlsym_warn(result, "git_repository_hashfile");
     _git_repository_set_head = (int (*)(
-	git_repository* repo,
-	const char* refname)) dlsym_warn(result, "git_repository_set_head");
+                                        git_repository* repo,
+                                        const char* refname)) dlsym_warn(result, "git_repository_set_head");
     _git_repository_set_head_detached = (int (*)(
-	git_repository* repo,
-	const git_oid* commitish)) dlsym_warn(result, "git_repository_set_head_detached");
+                                                 git_repository* repo,
+                                                 const git_oid* commitish)) dlsym_warn(result, "git_repository_set_head_detached");
     _git_repository_detach_head = (int (*)(
                                            git_repository* repo)) dlsym_warn(result, "git_repository_detach_head");
     _git_repository_state = (int (*)(git_repository *repo)) dlsym_warn(result, "git_repository_state");
@@ -447,10 +492,10 @@ SEXP load_library()
     _git_index_remove_bypath = (int (*)(git_index *index, const char *path)) dlsym_warn(result, "git_index_remove_bypath");
     _git_index_find = (int (*)(size_t *at_pos, git_index *index, const char *path)) dlsym_warn(result, "git_index_find");
     _git_index_conflict_add = (int (*)(
-   git_index *index,
-	const git_index_entry *ancestor_entry,
-	const git_index_entry *our_entry,
-   const git_index_entry *their_entry)) dlsym_warn(result, "git_index_conflict_add");
+                                       git_index *index,
+                                       const git_index_entry *ancestor_entry,
+                                       const git_index_entry *our_entry,
+                                       const git_index_entry *their_entry)) dlsym_warn(result, "git_index_conflict_add");
     _git_index_conflict_get = (int (*)(git_index_entry **ancestor_out, git_index_entry **our_out, git_index_entry **their_out, git_index *index, const char *path)) dlsym_warn(result, "git_index_conflict_get");
     _git_index_conflict_remove = (int (*)(git_index *index, const char *path)) dlsym_warn(result, "git_index_conflict_remove");
     _git_index_conflict_cleanup = (void (*)(git_index *index)) dlsym_warn(result, "git_index_conflict_cleanup");
@@ -460,8 +505,8 @@ SEXP load_library()
     _git_index_reuc_get_bypath = (const git_index_reuc_entry * (*)(git_index *index, const char *path)) dlsym_warn(result, "git_index_reuc_get_bypath");
     _git_index_reuc_get_byindex = (const git_index_reuc_entry * (*)(git_index *index, size_t n)) dlsym_warn(result, "git_index_reuc_get_byindex");
     _git_index_reuc_add = (int (*)(git_index *index, const char *path,
-	int ancestor_mode, git_oid *ancestor_id,
-	int our_mode, git_oid *our_id,
+                                   int ancestor_mode, git_oid *ancestor_id,
+                                   int our_mode, git_oid *our_id,
                                    int their_mode, git_oid *their_id)) dlsym_warn(result, "git_index_reuc_add");
     _git_index_reuc_remove = (int (*)(git_index *index, size_t n)) dlsym_warn(result, "git_index_reuc_remove");
 
@@ -483,32 +528,32 @@ SEXP load_library()
     _git_reference_packall = (int (*)(git_repository *repo)) dlsym_warn(result, "git_reference_packall");
     _git_reference_list = (int (*)(git_strarray *array, git_repository *repo, unsigned int list_flags)) dlsym_warn(result, "git_reference_list");
     _git_reference_foreach = (int (*)(
-	git_repository *repo,
-	unsigned int list_flags,
-	git_reference_foreach_cb callback,
-	void *payload)) dlsym_warn(result, "git_reference_foreach");
+                                      git_repository *repo,
+                                      unsigned int list_flags,
+                                      git_reference_foreach_cb callback,
+                                      void *payload)) dlsym_warn(result, "git_reference_foreach");
     _git_reference_is_packed = (int (*)(git_reference *ref)) dlsym_warn(result, "git_reference_is_packed");
     _git_reference_reload = (int (*)(git_reference *ref)) dlsym_warn(result, "git_reference_reload");
     _git_reference_free = (void (*)(git_reference *ref)) dlsym_warn(result, "git_reference_free");
     _git_reference_cmp = (int (*)(git_reference *ref1, git_reference *ref2)) dlsym_warn(result, "git_reference_cmp");
     _git_reference_foreach_glob = (int (*)(
-	git_repository *repo,
-	const char *glob,
-	unsigned int list_flags,
-	git_reference_foreach_cb callback,
-	void *payload)) dlsym_warn(result, "git_reference_foreach_glob");
+                                           git_repository *repo,
+                                           const char *glob,
+                                           unsigned int list_flags,
+                                           git_reference_foreach_cb callback,
+                                           void *payload)) dlsym_warn(result, "git_reference_foreach_glob");
     _git_reference_has_log = (int (*)(git_reference *ref)) dlsym_warn(result, "git_reference_has_log");
     _git_reference_is_branch = (int (*)(git_reference *ref)) dlsym_warn(result, "git_reference_is_branch");
     _git_reference_is_remote = (int (*)(git_reference *ref)) dlsym_warn(result, "git_reference_is_remote");
     _git_reference_normalize_name = (int (*)(
-	char *buffer_out,
-	size_t buffer_size,
-	const char *name,
-	unsigned int flags)) dlsym_warn(result, "git_reference_normalize_name");
+                                             char *buffer_out,
+                                             size_t buffer_size,
+                                             const char *name,
+                                             unsigned int flags)) dlsym_warn(result, "git_reference_normalize_name");
     _git_reference_peel = (int (*)(
-	git_object **out,
-	git_reference *ref,
-	git_otype type)) dlsym_warn(result, "git_reference_peel");
+                                   git_object **out,
+                                   git_reference *ref,
+                                   git_otype type)) dlsym_warn(result, "git_reference_peel");
     _git_reference_is_valid_name = (int (*)(const char *refname)) dlsym_warn(result, "git_reference_is_valid_name");
     
     _git_oid_fromstr = (int (*)(git_oid *out, const char *str)) dlsym_warn(result, "git_oid_fromstr");
@@ -559,16 +604,16 @@ SEXP load_library()
     _git_odb_object_type = (git_otype (*)(git_odb_object *object)) dlsym_warn(result, "git_odb_object_type");
 
     _git_object_lookup = (int (*)(
-   git_object **object,
-   git_repository *repo,
-   const git_oid *id,
-   git_otype type)) dlsym_warn(result, "git_object_lookup");
+                                  git_object **object,
+                                  git_repository *repo,
+                                  const git_oid *id,
+                                  git_otype type)) dlsym_warn(result, "git_object_lookup");
     _git_object_lookup_prefix = (int (*)(
-   git_object **object_out,
-   git_repository *repo,
-   const git_oid *id,
-   size_t len,
-   git_otype type)) dlsym_warn(result, "git_object_lookup_prefix");
+                                         git_object **object_out,
+                                         git_repository *repo,
+                                         const git_oid *id,
+                                         size_t len,
+                                         git_otype type)) dlsym_warn(result, "git_object_lookup_prefix");
     _git_object_id = (const git_oid * (*)(const git_object *obj)) dlsym_warn(result, "git_object_id");
     _git_object_type = (git_otype (*)(const git_object *obj)) dlsym_warn(result, "git_object_type");
     _git_object_owner = (git_repository * (*)(const git_object *obj)) dlsym_warn(result, "git_object_owner");
@@ -578,9 +623,9 @@ SEXP load_library()
     _git_object_typeisloose = (int (*)(git_otype type)) dlsym_warn(result, "git_object_typeisloose");
     _git_object__size = (size_t (*)(git_otype type)) dlsym_warn(result, "git_object__size");
     _git_object_peel = (int (*)(
-	git_object **peeled,
-	const git_object *object,
-	git_otype target_type)) dlsym_warn(result, "git_object_peel");
+                                git_object **peeled,
+                                const git_object *object,
+                                git_otype target_type)) dlsym_warn(result, "git_object_peel");
 
     _git_commit_message_encoding = (const char * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_message_encoding");
     _git_commit_message = (const char * (*)(const git_commit *commit)) dlsym_warn(result, "git_commit_message");
@@ -594,19 +639,19 @@ SEXP load_library()
     _git_commit_parent = (int (*)(git_commit **out, git_commit *commit, unsigned int n)) dlsym_warn(result, "git_commit_parent");
     _git_commit_parent_id = (const git_oid * (*)(git_commit *commit, unsigned int n)) dlsym_warn(result, "git_commit_parent_id");
     _git_commit_nth_gen_ancestor = (int (*)(git_commit **ancestor,
-                                    const git_commit *commit,
+                                            const git_commit *commit,
                                             unsigned int n)) dlsym_warn(result, "git_commit_nth_gen_ancestor");
     _git_commit_create = (int (*)(
- 	git_oid *id,
- 	git_repository *repo,
- 	const char *update_ref,
- 	const git_signature *author,
- 	const git_signature *committer,
- 	const char *message_encoding,
- 	const char *message,
- 	const git_tree *tree,
- 	int parent_count,
-        const git_commit *parents[])) dlsym_warn(result, "git_commit_create");
+                                  git_oid *id,
+                                  git_repository *repo,
+                                  const char *update_ref,
+                                  const git_signature *author,
+                                  const git_signature *committer,
+                                  const char *message_encoding,
+                                  const char *message,
+                                  const git_tree *tree,
+                                  int parent_count,
+                                  const git_commit *parents[])) dlsym_warn(result, "git_commit_create");
 
     _git_tree_id = (const git_oid * (*)(const git_tree *tree)) dlsym_warn(result, "git_tree_id");
     _git_tree_owner = (git_repository * (*)(const git_tree *tree)) dlsym_warn(result, "git_tree_owner");
@@ -618,9 +663,9 @@ SEXP load_library()
     _git_tree_entry_byoid = (const git_tree_entry * (*)(
                                                         const git_tree *tree, const git_oid *oid)) dlsym_warn(result, "git_tree_entry_byoid");
     _git_tree_entry_bypath = (int (*)(
-	git_tree_entry **out,
-	git_tree *root,
-	const char *path)) dlsym_warn(result, "git_tree_entry_bypath");
+                                      git_tree_entry **out,
+                                      git_tree *root,
+                                      const char *path)) dlsym_warn(result, "git_tree_entry_bypath");
     _git_tree_entry_dup = (git_tree_entry * (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_dup");
     _git_tree_entry_free = (void (*)(git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_free");
     _git_tree_entry_name = (const char * (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_name");
@@ -629,9 +674,9 @@ SEXP load_library()
     _git_tree_entry_filemode = (git_filemode_t (*)(const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_filemode");
     _git_tree_entry_cmp = (int (*)(const git_tree_entry *e1, const git_tree_entry *e2)) dlsym_warn(result, "git_tree_entry_cmp");
     _git_tree_entry_to_object = (int (*)(
-	git_object **object_out,
-	git_repository *repo,
-	const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_to_object");
+                                         git_object **object_out,
+                                         git_repository *repo,
+                                         const git_tree_entry *entry)) dlsym_warn(result, "git_tree_entry_to_object");
     _git_treebuilder_create = (int (*)(
                                        git_treebuilder **out, const git_tree *source)) dlsym_warn(result, "git_treebuilder_create");
     _git_treebuilder_clear = (void (*)(git_treebuilder *bld)) dlsym_warn(result, "git_treebuilder_clear");
@@ -640,37 +685,81 @@ SEXP load_library()
     _git_treebuilder_get = (const git_tree_entry * (*)(
                                                        git_treebuilder *bld, const char *filename)) dlsym_warn(result, "git_treebuilder_get");
     _git_treebuilder_insert = (int (*)(
-	const git_tree_entry **out,
-	git_treebuilder *bld,
-	const char *filename,
-	const git_oid *id,
-	git_filemode_t filemode)) dlsym_warn(result, "git_treebuilder_insert");
+                                       const git_tree_entry **out,
+                                       git_treebuilder *bld,
+                                       const char *filename,
+                                       const git_oid *id,
+                                       git_filemode_t filemode)) dlsym_warn(result, "git_treebuilder_insert");
     _git_treebuilder_remove = (int (*)(
                                        git_treebuilder *bld, const char *filename)) dlsym_warn(result, "git_treebuilder_remove");
     _git_treebuilder_filter = (void (*)(
-	git_treebuilder *bld,
-	git_treebuilder_filter_cb filter,
-	void *payload)) dlsym_warn(result, "git_treebuilder_filter");
+                                        git_treebuilder *bld,
+                                        git_treebuilder_filter_cb filter,
+                                        void *payload)) dlsym_warn(result, "git_treebuilder_filter");
     _git_treebuilder_write = (int (*)(
                                       git_oid *id, git_repository *repo, git_treebuilder *bld)) dlsym_warn(result, "git_treebuilder_write");
     _git_tree_walk = (int (*)(
-	const git_tree *tree,
-	git_treewalk_mode mode,
-	git_treewalk_cb callback,
-	void *payload)) dlsym_warn(result, "git_tree_walk");
+                              const git_tree *tree,
+                              git_treewalk_mode mode,
+                              git_treewalk_cb callback,
+                              void *payload)) dlsym_warn(result, "git_tree_walk");
 
     _git_blob_rawcontent = (const void * (*)(const git_blob *blob)) dlsym_warn(result, "git_blob_rawcontent");
     _git_blob_rawsize = (git_off_t (*)(const git_blob *blob)) dlsym_warn(result, "git_blob_rawsize");
     _git_blob_create_fromworkdir = (int (*)(git_oid *id, git_repository *repo, const char *relative_path)) dlsym_warn(result, "git_blob_create_fromworkdir");
     _git_blob_create_fromdisk = (int (*)(git_oid *id, git_repository *repo, const char *path)) dlsym_warn(result, "git_blob_create_fromdisk");
     _git_blob_create_fromchunks = (int (*)(
- git_oid *id,
- git_repository *repo,
- const char *hintpath,
- git_blob_chunk_cb callback,
- void *payload)) dlsym_warn(result, "git_blob_create_fromchunks");
+                                           git_oid *id,
+                                           git_repository *repo,
+                                           const char *hintpath,
+                                           git_blob_chunk_cb callback,
+                                           void *payload)) dlsym_warn(result, "git_blob_create_fromchunks");
     _git_blob_create_frombuffer = (int (*)(git_oid *oid, git_repository *repo, const void *buffer, size_t len)) dlsym_warn(result, "git_blob_create_frombuffer");
     _git_blob_is_binary = (int (*)(git_blob *blob)) dlsym_warn(result, "git_blob_is_binary");
+
+    _git_tag_id = (const git_oid * (*)(const git_tag *tag)) dlsym_warn(result, "git_tag_id");
+    _git_tag_target = (int (*)(git_object **target_out, const git_tag *tag)) dlsym_warn(result, "git_tag_target");
+    _git_tag_target_id = (const git_oid * (*)(const git_tag *tag)) dlsym_warn(result, "git_tag_target_id");
+    _git_tag_target_type = (git_otype (*)(const git_tag *tag)) dlsym_warn(result, "git_tag_target_type");
+    _git_tag_name = (const char * (*)(const git_tag *tag)) dlsym_warn(result, "git_tag_name");
+    _git_tag_tagger = (const git_signature * (*)(const git_tag *tag)) dlsym_warn(result, "git_tag_tagger");
+    _git_tag_message = (const char * (*)(const git_tag *tag)) dlsym_warn(result, "git_tag_message");
+    _git_tag_create = (int (*)(
+                               git_oid *oid,
+                               git_repository *repo,
+                               const char *tag_name,
+                               const git_object *target,
+                               const git_signature *tagger,
+                               const char *message,
+                               int force)) dlsym_warn(result, "git_tag_create");
+    _git_tag_create_frombuffer = (int (*)(
+                                          git_oid *oid,
+                                          git_repository *repo,
+                                          const char *buffer,
+                                          int force)) dlsym_warn(result, "git_tag_create_frombuffer");
+    _git_tag_create_lightweight = (int (*)(
+                                           git_oid *oid,
+                                           git_repository *repo,
+                                           const char *tag_name,
+                                           const git_object *target,
+                                           int force)) dlsym_warn(result, "git_tag_create_lightweight");
+    _git_tag_delete = (int (*)(
+                               git_repository *repo,
+                               const char *tag_name)) dlsym_warn(result, "git_tag_delete");
+    _git_tag_list = (int (*)(
+                             git_strarray *tag_names,
+                             git_repository *repo)) dlsym_warn(result, "git_tag_list");
+    _git_tag_list_match = (int (*)(
+                                   git_strarray *tag_names,
+                                   const char *pattern,
+                                   git_repository *repo)) dlsym_warn(result, "git_tag_list_match");
+    _git_tag_foreach = (int (*)(
+                                git_repository *repo,
+                                git_tag_foreach_cb callback,
+                                void *payload)) dlsym_warn(result, "git_tag_foreach");
+    _git_tag_peel = (int (*)(
+                             git_object **tag_target_out,
+                             const git_tag *tag)) dlsym_warn(result, "git_tag_peel");
 
     return Rcpp::LogicalVector::create(true);
     END_RCPP

@@ -41,18 +41,12 @@ SEXP Commit::time()
 
 SEXP Commit::committer()
 {
-    const git_signature *result = _git_commit_committer(commit.get());
-    return Rcpp::List::create(Rcpp::Named("name") = std::string(result->name),
-                              Rcpp::Named("email") = std::string(result->email),
-                              Rcpp::Named("time") = Time::create(&result->when));
+    return Signature::create(_git_commit_committer(commit.get()));
 }
 
 SEXP Commit::author()
 {
-    const git_signature *result = _git_commit_author(commit.get());
-    return Rcpp::List::create(Rcpp::Named("name") = std::string(result->name),
-                              Rcpp::Named("email") = std::string(result->email),
-                              Rcpp::Named("time") = Time::create(&result->when));
+    return Signature::create(_git_commit_author(commit.get()));
 }
 
 int Commit::type()

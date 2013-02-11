@@ -337,6 +337,52 @@ extern int (*_git_blob_create_fromchunks)(
 extern int (*_git_blob_create_frombuffer)(git_oid *oid, git_repository *repo, const void *buffer, size_t len);
 extern int (*_git_blob_is_binary)(git_blob *blob);
 
+// tag
+
+extern const git_oid * (*_git_tag_id)(const git_tag *tag);
+extern int (*_git_tag_target)(git_object **target_out, const git_tag *tag);
+extern const git_oid * (*_git_tag_target_id)(const git_tag *tag);
+extern git_otype (*_git_tag_target_type)(const git_tag *tag);
+extern const char * (*_git_tag_name)(const git_tag *tag);
+extern const git_signature * (*_git_tag_tagger)(const git_tag *tag);
+extern const char * (*_git_tag_message)(const git_tag *tag);
+extern int (*_git_tag_create)(
+	git_oid *oid,
+	git_repository *repo,
+	const char *tag_name,
+	const git_object *target,
+	const git_signature *tagger,
+	const char *message,
+	int force);
+extern int (*_git_tag_create_frombuffer)(
+	git_oid *oid,
+	git_repository *repo,
+	const char *buffer,
+	int force);
+extern int (*_git_tag_create_lightweight)(
+	git_oid *oid,
+	git_repository *repo,
+	const char *tag_name,
+	const git_object *target,
+	int force);
+extern int (*_git_tag_delete)(
+	git_repository *repo,
+	const char *tag_name);
+extern int (*_git_tag_list)(
+	git_strarray *tag_names,
+	git_repository *repo);
+extern int (*_git_tag_list_match)(
+	git_strarray *tag_names,
+	const char *pattern,
+	git_repository *repo);
+extern int (*_git_tag_foreach)(
+	git_repository *repo,
+	git_tag_foreach_cb callback,
+	void *payload);
+extern int (*_git_tag_peel)(
+	git_object **tag_target_out,
+	const git_tag *tag);
+
 /******************************************************************************/
 
 RcppExport SEXP load_library();

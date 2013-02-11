@@ -4,9 +4,9 @@
 
 /******************************************************************************/
 
-class Time
+struct Time
 {
 public:
     static SEXP create(const git_time *t);
-    git_time from_sexp(SEXP sexp);
+    static git_time from_sexp(SEXP sexp);
 };
