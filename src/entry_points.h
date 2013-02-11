@@ -383,6 +383,13 @@ extern int (*_git_tag_peel)(
 	git_object **tag_target_out,
 	const git_tag *tag);
 
+// signature
+
+extern int (*_git_signature_new)(git_signature **out, const char *name, const char *email, git_time_t time, int offset);
+extern int (*_git_signature_now)(git_signature **out, const char *name, const char *email);
+extern git_signature * (*_git_signature_dup)(const git_signature *sig);
+extern void (*_git_signature_free)(git_signature *sig);
+
 /******************************************************************************/
 
 RcppExport SEXP load_library();

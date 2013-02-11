@@ -7,6 +7,10 @@
 #include "commit.h"
 
 /******************************************************************************/
+Repository::Repository(git_repository *_repo)
+{
+    repo = boost::shared_ptr<git_repository>(_repo, _git_repository_free);
+}
 
 Repository::Repository(std::string path)
 {
@@ -25,6 +29,11 @@ Rcpp::Reference Repository::head()
     return Rcpp::internal::make_new_object(new GitReference(ref));
 };
 
+bool Repository::head_detached()
+{
+    return _git_repository_head_detached(repo.get());
+}
+
 Rcpp::Reference Repository::index()
 {
     git_index *ix;
@@ -35,6 +44,11 @@ Rcpp::Reference Repository::index()
 bool Repository::is_bare()
 {
     return _git_repository_is_bare(repo.get());
+};
+
+bool Repository::is_empty()
+{
+    return _git_repository_is_empty(repo.get());
 };
 
 Rcpp::Reference Repository::odb()
@@ -111,13 +125,26 @@ SEXP Repository::object_lookup(SEXP soid, int otype)
     END_RCPP
 }
 
+Rcpp::Reference repository_init(std::string path, bool is_bare)
+{
+    BEGIN_RCPP
+    git_repository *_repo;
+    int err = _git_repository_init(&_repo, path.c_str(), (unsigned) is_bare);
+    if (err)
+        throw Rcpp::exception("git_repository_init failed");
+    return Repository::create(_repo);
+    END_RCPP
+}
+
 RCPP_MODULE(guitar_repository) {
     using namespace Rcpp;
     class_<Repository>("Repository")
         .constructor<std::string>()
         .method("head", &Repository::head)
+        .method("head_detached", &Repository::head_detached)
         .method("index", &Repository::index)
         .method("is_bare", &Repository::is_bare)
+        .method("is_empty", &Repository::is_empty)
         .method("odb", &Repository::odb)
         .method("workdir", &Repository::workdir)
         .method("reference_lookup", &Repository::reference_lookup)
@@ -125,4 +152,5 @@ RCPP_MODULE(guitar_repository) {
         .method("name_to_id", &Repository::name_to_id)
         .method("reference_list", &Repository::reference_list)
         ;
+    function("repository_init", &repository_init);
 };

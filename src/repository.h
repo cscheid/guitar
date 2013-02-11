@@ -11,6 +11,7 @@ class Repository: public CPPWrapperObjectTraits<Repository, git_repository>
 {
 public:
     explicit Repository(std::string path);
+    explicit Repository(git_repository *_repo);
 
     // git_repository_config,
     // git_repository_detach_head,
@@ -19,13 +20,13 @@ public:
     // git_repository_free,
     // git_repository_hashfile,
     Rcpp::Reference head();
+    bool head_detached();
     // git_repository_head_detached,
     // git_repository_head_orphan,
     Rcpp::Reference index();
-    // git_repository_init,
     // git_repository_init_ext,
     bool is_bare();
-    // git_repository_is_empty,
+    bool is_empty();
     // git_repository_merge_cleanup,
     // git_repository_mergehead_foreach,
     // git_repository_message,

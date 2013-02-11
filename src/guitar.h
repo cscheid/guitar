@@ -31,7 +31,9 @@ struct CPPWrapperObjectTraits {
 
 SEXP object_to_sexp(git_object *obj);
 
-struct Signature {
-    static SEXP create(const git_signature *sig);
-    static git_signature from_sexp(SEXP s);
+// with namespace instead of struct and static methods, I can use
+// the functions inside RCPP_MODULEs
+namespace Signature {
+    SEXP create(const git_signature *sig);
+    SEXP now(std::string name, std::string email);
 };

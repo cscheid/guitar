@@ -388,6 +388,14 @@ int (*_git_tag_peel)(
                      git_object **tag_target_out,
                      const git_tag *tag);
 
+// signature
+
+int (*_git_signature_new)(git_signature **out, const char *name, const char *email, git_time_t time, int offset);
+int (*_git_signature_now)(git_signature **out, const char *name, const char *email);
+git_signature * (*_git_signature_dup)(const git_signature *sig);
+void (*_git_signature_free)(git_signature *sig);
+
+
 /******************************************************************************/
 // function 
 SEXP load_library()
@@ -760,6 +768,13 @@ SEXP load_library()
     _git_tag_peel = (int (*)(
                              git_object **tag_target_out,
                              const git_tag *tag)) dlsym_warn(result, "git_tag_peel");
+
+    // signature
+
+    _git_signature_new = (int (*)(git_signature **out, const char *name, const char *email, git_time_t time, int offset)) dlsym_warn(result, "git_signature_new");
+    _git_signature_now = (int (*)(git_signature **out, const char *name, const char *email)) dlsym_warn(result, "git_signature_now");
+    _git_signature_dup = (git_signature * (*)(const git_signature *sig)) dlsym_warn(result, "git_signature_dup");
+    _git_signature_free = (void (*)(git_signature *sig)) dlsym_warn(result, "git_signature_free");
 
     return Rcpp::LogicalVector::create(true);
     END_RCPP
