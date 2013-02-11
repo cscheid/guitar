@@ -10,7 +10,7 @@ using namespace Rcpp;
 
 SEXP object_to_sexp(git_object *obj)
 {
-    git_otype result_type = _git_object_type(obj);
+    git_otype result_type = git_object_type(obj);
     
     switch (result_type) {
     case GIT_OBJ_COMMIT: {
@@ -52,8 +52,8 @@ SEXP Signature::create(const git_signature *signature)
 SEXP Signature::now(std::string name, std::string email)
 {
     git_signature *_result;
-    _git_signature_now(&_result, name.c_str(), email.c_str());
+    git_signature_now(&_result, name.c_str(), email.c_str());
     SEXP result = Signature::create(_result);
-    _git_signature_free(_result);
+    git_signature_free(_result);
     return result;
 }

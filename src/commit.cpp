@@ -5,65 +5,65 @@
 
 /******************************************************************************/
 
-static void __git_commit_free(git_commit *commit)
+static void _git_commit_free(git_commit *commit)
 {
-    _git_object_free((git_object *)commit);
+    git_object_free((git_object *)commit);
 }
 
 Commit::Commit(git_commit *_commit)
 {
-    commit = boost::shared_ptr<git_commit>(_commit, __git_commit_free);
+    commit = boost::shared_ptr<git_commit>(_commit, _git_commit_free);
 }
 
 Rcpp::Reference Commit::id()
 {
-    const git_oid *result = _git_object_id((const git_object *)commit.get());
+    const git_oid *result = git_object_id((const git_object *)commit.get());
     return OID::create(result);
 }
 
 std::string Commit::message_encoding()
 {
-    return std::string(_git_commit_message_encoding(commit.get()));
+    return std::string(git_commit_message_encoding(commit.get()));
 }
 
 std::string Commit::message()
 {
-    return std::string(_git_commit_message(commit.get()));
+    return std::string(git_commit_message(commit.get()));
 }
 
 SEXP Commit::time()
 {
     git_time r;
-    r.time = _git_commit_time(commit.get());
-    r.offset = _git_commit_time_offset(commit.get());
+    r.time = git_commit_time(commit.get());
+    r.offset = git_commit_time_offset(commit.get());
     return Time::create(&r);
 }
 
 SEXP Commit::committer()
 {
-    return Signature::create(_git_commit_committer(commit.get()));
+    return Signature::create(git_commit_committer(commit.get()));
 }
 
 SEXP Commit::author()
 {
-    return Signature::create(_git_commit_author(commit.get()));
+    return Signature::create(git_commit_author(commit.get()));
 }
 
 int Commit::type()
 {
-    return _git_object_type((git_object*)commit.get());
+    return git_object_type((git_object*)commit.get());
 }
 
 unsigned int Commit::parent_count()
 {
-    return _git_commit_parentcount(commit.get());
+    return git_commit_parentcount(commit.get());
 }
 
 Rcpp::Reference Commit::parent(unsigned int n)
 {
     BEGIN_RCPP
     git_commit *result;
-    int err = _git_commit_parent(&result, commit.get(), n);
+    int err = git_commit_parent(&result, commit.get(), n);
     if (err)
         throw Rcpp::exception("bad parent number");
     return Commit::create(result);
@@ -85,7 +85,7 @@ Rcpp::List Commit::parent_list()
 Rcpp::Reference Commit::parent_id(unsigned int n)
 {
     BEGIN_RCPP
-    const git_oid *result = _git_commit_parent_id(commit.get(), n);
+    const git_oid *result = git_commit_parent_id(commit.get(), n);
     return OID::create(result);
     END_RCPP
 }

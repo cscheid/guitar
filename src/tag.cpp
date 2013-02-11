@@ -4,41 +4,41 @@
 
 /******************************************************************************/
 
-static void __git_tag_free(git_tag *tag)
+static void _git_tag_free(git_tag *tag)
 {
-    _git_object_free((git_object*) tag);
+    git_object_free((git_object*) tag);
 }
 
 Tag::Tag(git_tag *_tag)
 {
-    tag = boost::shared_ptr<git_tag>(_tag, __git_tag_free);
+    tag = boost::shared_ptr<git_tag>(_tag, _git_tag_free);
 }
 
 Rcpp::Reference Tag::id()
 {
-    return OID::create(_git_tag_id(tag.get()));
+    return OID::create(git_tag_id(tag.get()));
 }
 
 Rcpp::Reference Tag::target_id()
 {
-    return OID::create(_git_tag_target_id(tag.get()));
+    return OID::create(git_tag_target_id(tag.get()));
 }
 
 std::string Tag::message()
 {
-    return std::string(_git_tag_message(tag.get()));
+    return std::string(git_tag_message(tag.get()));
 }
 
 std::string Tag::name()
 {
-    return std::string(_git_tag_name(tag.get()));
+    return std::string(git_tag_name(tag.get()));
 }
 
 SEXP Tag::peel()
 {
     BEGIN_RCPP
     git_object *result;
-    int err = _git_tag_peel(&result, tag.get());
+    int err = git_tag_peel(&result, tag.get());
     if (err)
         throw Rcpp::exception("object lookup failed");
     return object_to_sexp(result);
@@ -47,14 +47,14 @@ SEXP Tag::peel()
 
 SEXP Tag::tagger()
 {
-    return Signature::create(_git_tag_tagger(tag.get()));
+    return Signature::create(git_tag_tagger(tag.get()));
 }
 
 SEXP Tag::target()
 {
     BEGIN_RCPP
     git_object *result;
-    int err = _git_tag_target(&result, tag.get());
+    int err = git_tag_target(&result, tag.get());
     if (err)
         throw Rcpp::exception("object lookup failed");
     return object_to_sexp(result);
@@ -63,7 +63,7 @@ SEXP Tag::target()
 
 int Tag::target_type()
 {
-    return _git_tag_target_type(tag.get());
+    return git_tag_target_type(tag.get());
 }
 
 RCPP_MODULE(guitar_tag) {

@@ -7,13 +7,13 @@ using namespace Rcpp;
 
 Index::Index(git_index *_ix)
 {
-    ix = boost::shared_ptr<git_index>(_ix, _git_index_free);
+    ix = boost::shared_ptr<git_index>(_ix, git_index_free);
 }
 
 SEXP Index::read()
 {
     BEGIN_RCPP
-    int result = _git_index_read(ix.get());
+    int result = git_index_read(ix.get());
     if (result) {
         throw Rcpp::exception("Index::read error");
     }
@@ -24,7 +24,7 @@ SEXP Index::read()
 SEXP Index::write()
 {
     BEGIN_RCPP
-    int result = _git_index_write(ix.get());
+    int result = git_index_write(ix.get());
     if (result) {
         throw Rcpp::exception("Index::write error");
     }
@@ -35,7 +35,7 @@ SEXP Index::write()
 void Index::read_tree(SEXP _tree)
 {
     const git_tree *tree = Tree::from_sexp(_tree);
-    int err = _git_index_read_tree(ix.get(), tree);
+    int err = git_index_read_tree(ix.get(), tree);
     if (err)
         throw Rcpp::exception("read_tree error");
 }
@@ -43,7 +43,7 @@ void Index::read_tree(SEXP _tree)
 Rcpp::Reference Index::write_tree()
 {
     git_oid result;
-    int err = _git_index_write_tree(&result, ix.get());
+    int err = git_index_write_tree(&result, ix.get());
     if (err)
         throw Rcpp::exception("write_tree error");
     return OID::create(&result);
@@ -51,31 +51,31 @@ Rcpp::Reference Index::write_tree()
 
 size_t Index::entrycount()
 {
-    return _git_index_entrycount(ix.get());
+    return git_index_entrycount(ix.get());
 }
 
 void Index::clear()
 {
-    _git_index_clear(ix.get());
+    git_index_clear(ix.get());
 }
 
 void Index::add_by_path(std::string path)
 {
-    int err = _git_index_add_bypath(ix.get(), path.c_str());
+    int err = git_index_add_bypath(ix.get(), path.c_str());
     if (err)
         throw Rcpp::exception("add_by_path failed");
 }
 
 void Index::remove_by_path(std::string path)
 {
-    int err = _git_index_remove_bypath(ix.get(), path.c_str());
+    int err = git_index_remove_bypath(ix.get(), path.c_str());
     if (err)
         throw Rcpp::exception("remove_by_path failed");
 }
 
 void Index::remove_directory(std::string path, int stage)
 {
-    int err = _git_index_remove_directory(ix.get(), path.c_str(), stage);
+    int err = git_index_remove_directory(ix.get(), path.c_str(), stage);
     if (err)
         throw Rcpp::exception("remove_directory failed");
 }

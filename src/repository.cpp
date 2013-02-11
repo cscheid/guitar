@@ -9,23 +9,23 @@
 /******************************************************************************/
 Repository::Repository(git_repository *_repo)
 {
-    repo = boost::shared_ptr<git_repository>(_repo, _git_repository_free);
+    repo = boost::shared_ptr<git_repository>(_repo, git_repository_free);
 }
 
 Repository::Repository(std::string path)
 {
     git_repository *_repo;
-    int err = _git_repository_open(&_repo, path.c_str());
+    int err = git_repository_open(&_repo, path.c_str());
     if (err)
         throw Rcpp::exception("Repository not found");
     
-    repo = boost::shared_ptr<git_repository>(_repo, _git_repository_free);
+    repo = boost::shared_ptr<git_repository>(_repo, git_repository_free);
 }
 
 Rcpp::Reference Repository::hash_file(std::string path, int type)
 {
     git_oid out;
-    int err = _git_repository_hashfile(&out, repo.get(), path.c_str(), (git_otype) type, path.c_str());
+    int err = git_repository_hashfile(&out, repo.get(), path.c_str(), (git_otype) type, path.c_str());
     if (err)
         throw Rcpp::exception("hash_file failed");
     return OID::create(&out);
@@ -34,42 +34,42 @@ Rcpp::Reference Repository::hash_file(std::string path, int type)
 Rcpp::Reference Repository::head()
 {
     git_reference *ref;
-    _git_repository_head(&ref, repo.get());
+    git_repository_head(&ref, repo.get());
     return Rcpp::internal::make_new_object(new GitReference(ref));
 };
 
 bool Repository::head_detached()
 {
-    return _git_repository_head_detached(repo.get());
+    return git_repository_head_detached(repo.get());
 }
 
 bool Repository::head_orphan()
 {
-    return _git_repository_head_orphan(repo.get());
+    return git_repository_head_orphan(repo.get());
 }
 
 Rcpp::Reference Repository::index()
 {
     git_index *ix;
-    _git_repository_index(&ix, repo.get());
+    git_repository_index(&ix, repo.get());
     return Rcpp::internal::make_new_object(new Index(ix));
 };
 
 bool Repository::is_bare()
 {
-    return _git_repository_is_bare(repo.get());
+    return git_repository_is_bare(repo.get());
 };
 
 bool Repository::is_empty()
 {
-    return _git_repository_is_empty(repo.get());
+    return git_repository_is_empty(repo.get());
 };
 
 Rcpp::Reference Repository::odb()
 {
     BEGIN_RCPP
     git_odb *odb;
-    int result = _git_repository_odb(&odb, repo.get());
+    int result = git_repository_odb(&odb, repo.get());
     if (result)
         throw Rcpp::exception("Repository::odb error");
     return Rcpp::internal::make_new_object(new ODB(odb));
@@ -78,12 +78,12 @@ Rcpp::Reference Repository::odb()
 
 std::string Repository::path()
 {
-    return std::string(_git_repository_path(repo.get()));
+    return std::string(git_repository_path(repo.get()));
 }
 
 void Repository::set_head(std::string refname)
 {
-    int err = _git_repository_set_head(repo.get(), refname.c_str());
+    int err = git_repository_set_head(repo.get(), refname.c_str());
     if (err)
         throw Rcpp::exception("set_head failed");
 }
@@ -91,19 +91,19 @@ void Repository::set_head(std::string refname)
 void Repository::set_head_detached(SEXP _oid)
 {
     const git_oid *oid = OID::from_sexp(_oid);
-    int err = _git_repository_set_head_detached(repo.get(), oid);
+    int err = git_repository_set_head_detached(repo.get(), oid);
     if (err)
         throw Rcpp::exception("set_head detached failed");
 }
 
 int Repository::state()
 {
-    return _git_repository_state(repo.get());
+    return git_repository_state(repo.get());
 }
 
 std::string Repository::workdir()
 {
-    const char *r = _git_repository_workdir(repo.get());
+    const char *r = git_repository_workdir(repo.get());
     return r ? std::string(r) : std::string("");
 };
 
@@ -111,7 +111,7 @@ Rcpp::Reference Repository::reference_lookup(std::string name)
 {
     BEGIN_RCPP
     git_reference *ref;
-    int result = _git_reference_lookup(&ref, repo.get(), name.c_str());
+    int result = git_reference_lookup(&ref, repo.get(), name.c_str());
     if (result)
         throw Rcpp::exception("Repository::lookup error");
     return Rcpp::internal::make_new_object(new GitReference(ref));
@@ -122,7 +122,7 @@ Rcpp::Reference Repository::name_to_id(std::string name)
 {
     BEGIN_RCPP
     OID *oid = new OID;
-    int result = _git_reference_name_to_id((*oid), repo.get(), name.c_str());
+    int result = git_reference_name_to_id((*oid), repo.get(), name.c_str());
     if (result) {
         delete oid;
         throw Rcpp::exception("Repository::lookup error");
@@ -135,16 +135,16 @@ SEXP Repository::reference_list(unsigned int flags)
 {
     BEGIN_RCPP
     git_strarray result;
-    int err = _git_reference_list(&result, repo.get(), flags);
+    int err = git_reference_list(&result, repo.get(), flags);
     if (err) {
-        _git_strarray_free(&result);
+        git_strarray_free(&result);
         throw Rcpp::exception("Repository::reference_list error");
     }
     Rcpp::StringVector rresult(result.count);
     for (int i=0; i<result.count; ++i) {
         rresult[i] = std::string(result.strings[i]);
     }
-    _git_strarray_free(&result);
+    git_strarray_free(&result);
     return rresult;
     END_RCPP
 }
@@ -155,7 +155,7 @@ SEXP Repository::object_lookup(SEXP soid, int otype)
     const git_oid *oid = OID::from_sexp(soid);
     git_otype type = (git_otype) otype;
     git_object *obj;
-    int err = _git_object_lookup(&obj, repo.get(), oid, type);
+    int err = git_object_lookup(&obj, repo.get(), oid, type);
     if (err) {
         throw Rcpp::exception("git_object_lookup failed");
     }
@@ -168,7 +168,7 @@ Rcpp::Reference repository_init(std::string path, bool is_bare)
 {
     BEGIN_RCPP
     git_repository *_repo;
-    int err = _git_repository_init(&_repo, path.c_str(), (unsigned) is_bare);
+    int err = git_repository_init(&_repo, path.c_str(), (unsigned) is_bare);
     if (err)
         throw Rcpp::exception("git_repository_init failed");
     return Repository::create(_repo);

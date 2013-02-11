@@ -6,12 +6,12 @@
 
 ODB::ODB(git_odb *_odb)
 {
-    odb = boost::shared_ptr<git_odb>(_odb, _git_odb_free);
+    odb = boost::shared_ptr<git_odb>(_odb, git_odb_free);
 }
 
 bool ODB::exists(SEXP s)
 {
-    return _git_odb_exists(odb.get(), OID::from_sexp(s));
+    return git_odb_exists(odb.get(), OID::from_sexp(s));
 }
 
 // FIXME: add early termination by checking the result of callback.
@@ -25,7 +25,7 @@ static int foreach_cb(const git_oid *id, void *payload)
 
 void ODB::foreach(Rcpp::Function fcall)
 {
-    _git_odb_foreach(odb.get(), &foreach_cb, &fcall);
+    git_odb_foreach(odb.get(), &foreach_cb, &fcall);
 }
 
 static int list_cb(const git_oid *id, void *payload)
@@ -40,7 +40,7 @@ Rcpp::List ODB::list()
 {
     BEGIN_RCPP
     Rcpp::List v;
-    _git_odb_foreach(odb.get(), &list_cb, &v);
+    git_odb_foreach(odb.get(), &list_cb, &v);
     return v;
     END_RCPP
 }
@@ -48,7 +48,7 @@ Rcpp::List ODB::list()
 Rcpp::Reference ODB::read(SEXP s)
 {
     git_odb_object *result;
-    _git_odb_read(&result, odb.get(), OID::from_sexp(s));
+    git_odb_read(&result, odb.get(), OID::from_sexp(s));
     return Rcpp::internal::make_new_object(new ODBObject(result));
 }
 

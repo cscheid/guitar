@@ -7,19 +7,19 @@
 
 ODBObject::ODBObject(git_odb_object *_obj)
 {
-    obj = boost::shared_ptr<git_odb_object>(_obj, _git_odb_object_free);
+    obj = boost::shared_ptr<git_odb_object>(_obj, git_odb_object_free);
 }
 
 size_t ODBObject::size()
 {
-    return _git_odb_object_size(obj.get());
+    return git_odb_object_size(obj.get());
 }
 
 Rcpp::RawVector ODBObject::data()
 {
     BEGIN_RCPP
-    size_t sz = _git_odb_object_size(obj.get());
-    const void *ptr = _git_odb_object_data(obj.get());
+    size_t sz = git_odb_object_size(obj.get());
+    const void *ptr = git_odb_object_data(obj.get());
     const char *b = (const char *)ptr;
     const char *e = b + sz;
     Rcpp::RawVector result(sz);
@@ -30,12 +30,12 @@ Rcpp::RawVector ODBObject::data()
 
 unsigned int ODBObject::type()
 {
-    return _git_odb_object_type(obj.get());
+    return git_odb_object_type(obj.get());
 }
 
 Rcpp::Reference ODBObject::id()
 {
-    return OID::create(_git_odb_object_id(obj.get()));
+    return OID::create(git_odb_object_id(obj.get()));
 }
 
 RCPP_MODULE(guitar_odb_object) {

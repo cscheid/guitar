@@ -5,12 +5,12 @@ using namespace Rcpp;
 
 GitReference::GitReference(git_reference *_ref)
 {
-    ref = boost::shared_ptr<git_reference>(_ref, _git_reference_free);
+    ref = boost::shared_ptr<git_reference>(_ref, git_reference_free);
 }
 
 bool GitReference::has_log()
 {
-    return _git_reference_has_log(ref.get());
+    return git_reference_has_log(ref.get());
 }
 
 RCPP_MODULE(guitar_reference) {

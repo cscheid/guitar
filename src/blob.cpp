@@ -4,36 +4,36 @@
 
 /******************************************************************************/
 
-static void __git_blob_free(git_blob *blob)
+static void _git_blob_free(git_blob *blob)
 {
-    _git_object_free((git_object*) blob);
+    git_object_free((git_object*) blob);
 }
 
 Blob::Blob(git_blob *_blob)
 {
-    blob = boost::shared_ptr<git_blob>(_blob, __git_blob_free);
+    blob = boost::shared_ptr<git_blob>(_blob, _git_blob_free);
 }
 
 Rcpp::Reference Blob::id()
 {
-    return OID::create(_git_object_id((git_object *)blob.get()));
+    return OID::create(git_object_id((git_object *)blob.get()));
 }
 
 bool Blob::is_binary()
 {
-    return _git_blob_is_binary(blob.get());
+    return git_blob_is_binary(blob.get());
 }
 
 size_t Blob::size()
 {
-    return _git_blob_rawsize(blob.get());
+    return git_blob_rawsize(blob.get());
 }
 
 Rcpp::RawVector Blob::data()
 {
     BEGIN_RCPP
-    size_t sz = _git_blob_rawsize(blob.get());
-    const void *ptr = _git_blob_rawcontent(blob.get());
+    size_t sz = git_blob_rawsize(blob.get());
+    const void *ptr = git_blob_rawcontent(blob.get());
     const char *b = (const char *)ptr;
     const char *e = b + sz;
     Rcpp::RawVector result(sz);
