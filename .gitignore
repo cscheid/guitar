@@ -2,4 +2,8 @@ src-i386
 src-x86_64
 *~
 tests/test-all.Rout
-*/.Rdata
+*.o
+*.so
+*/.RData
+*/.Rhistory
+

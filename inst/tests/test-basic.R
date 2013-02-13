@@ -1,7 +1,13 @@
 context("basic sanity checks.")
 
-## repo.path <- paste(getwd(), "/../.git", sep="")
-repo.path <- "/Users/cscheid/code/guitar/.git"
+repo.path = paste(tempdir(), "/repo1", sep="")
+
+setup.tests <- function ()
+{
+  system(paste("tar xzf ", system.file(package="guitar"), "/data/test-repos/repo1.tar.gz", " -C ", tempdir(), sep=""))
+}
+
+setup.tests()
 
 test_that("repositories can be loaded", {
   expect_that(new(guitar::Repository, repo.path), is_a("Rcpp_Repository"))
