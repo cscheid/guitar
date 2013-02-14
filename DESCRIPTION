@@ -13,5 +13,3 @@ RcppModules: guitar_reference, guitar_repository, guitar_types, guitar_index, gu
 Suggests:
     testthat,
     roxygen2
-Collate:
-    'guitar-package.r'
