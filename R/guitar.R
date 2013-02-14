@@ -1,5 +1,19 @@
 .onLoad <- function(libname, pkgname) {
-  loadRcppModules();
+  # in order to work around Rcpp's overly strict requirements on who
+  # can call loadRcppModules, we reproduce the necessary functionality
+  # here.
+  
+  ## loadRcppModules();
+  ns <- asNamespace(pkgname);
+  print(ns);
+  description <- packageDescription(pkgname, libname)
+  modules <- strsplit(description[["RcppModules"]], "[[:space:]]*,[[:space:]]*")[[1L]]
+  cat(modules);
+  for (m in modules) {
+    mod <- Rcpp::Module(m, pkgname, mustStart = TRUE)
+    populate(mod, ns)
+    assign(Rcpp:::.moduleMetaName(m), mod, envir = ns)
+  }
 }
 
 # I need this for now because I know of no other way to access the
