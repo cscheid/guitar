@@ -43,3 +43,15 @@ test_that("repositories have ODBs which can be listed", {
   l <- o$list()
   expect_that(o$exists(l[[1]]), equals(TRUE))
 })
+
+test_that("ODBs have OIDs which can be looked up", {
+  r <- new(guitar::Repository, repo.path)
+  o <- r$odb()
+  expect_that(o, is_a("Rcpp_ODB"))
+  l <- o$list()
+  for (oid in sample(l, 10, replace=TRUE)) {
+    obj <- r$object_lookup(oid, guitar::GIT_OBJ_ANY)
+    expect_that(obj, is_a(c("Rcpp_Tree", "Rcpp_Commit", "Rcpp_Blob", "Rcpp_Tag")))
+  }
+})
+
