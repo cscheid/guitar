@@ -4,6 +4,7 @@
 #include "reference.h"
 #include "oid.h"
 #include "odb.h"
+#include "tree.h"
 #include "commit.h"
 
 /******************************************************************************/
@@ -164,6 +165,39 @@ SEXP Repository::object_lookup(SEXP soid, int otype)
     END_RCPP
 }
 
+void Repository::create_commit(std::string update_ref,
+                               SEXP author_s,
+                               SEXP committer_s,
+                               std::string message_encoding,
+                               std::string message,
+                               SEXP tree,
+                               SEXP parents)
+{
+    Rcpp::List parents_l(Rcpp::as<Rcpp::List>(parents));
+    std::vector<const git_commit *> parents_v(parents_l.size());
+
+    for (size_t i=0; i<parents_l.size(); ++i) {
+        parents_v[i] = Commit::from_sexp(parents_l[i]);
+    }
+
+    git_oid result_oid;
+    git_signature *author = Signature::from_sexp(author_s);
+    git_signature *committer = Signature::from_sexp(committer_s);
+
+    int err = git_commit_create(&result_oid,
+                                repo.get(),
+                                update_ref.c_str(),
+                                author, committer,
+                                message_encoding.c_str(), message.c_str(),
+                                Tree::from_sexp(tree),
+                                parents_v.size(),
+                                &parents_v[0]);
+    git_signature_free(author);
+    git_signature_free(committer);
+    if (err)
+        throw Rcpp::exception("git_create_commit failed");
+}
+
 Rcpp::Reference repository_init(std::string path, bool is_bare)
 {
     BEGIN_RCPP
@@ -196,6 +230,7 @@ RCPP_MODULE(guitar_repository) {
         .method("object_lookup", &Repository::object_lookup)
         .method("name_to_id", &Repository::name_to_id)
         .method("reference_list", &Repository::reference_list)
+        .method("create_commit", &Repository::create_commit)
         ;
     function("repository_init", &repository_init);
 };

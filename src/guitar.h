@@ -36,4 +36,5 @@ SEXP object_to_sexp(git_object *obj);
 namespace Signature {
     SEXP create(const git_signature *sig);
     SEXP now(std::string name, std::string email);
+    git_signature *from_sexp(SEXP sig); // You're responsible to ensure this is git_signature_free'd
 };

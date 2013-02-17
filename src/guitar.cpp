@@ -5,8 +5,10 @@
 #include "blob.h"
 #include "time.h"
 #include "tag.h"
+#include <iostream>
 
 using namespace Rcpp;
+using namespace std;
 
 SEXP object_to_sexp(git_object *obj)
 {
@@ -49,11 +51,30 @@ SEXP Signature::create(const git_signature *signature)
                               Rcpp::Named("time") = Time::create(&signature->when));
 }
 
+git_signature *Signature::from_sexp(SEXP sexp)
+{
+    git_signature *result;
+    Rcpp::List l(Rcpp::as<Rcpp::List>(sexp));
+    git_time t = Time::from_sexp(l["time"]);
+    git_signature_new
+        (&result, 
+         Rcpp::as<std::string>(l["name"]).c_str(),
+         Rcpp::as<std::string>(l["email"]).c_str(),
+         t.time, t.offset);
+    return result;
+}
+
 SEXP Signature::now(std::string name, std::string email)
 {
     git_signature *_result;
     git_signature_now(&_result, name.c_str(), email.c_str());
+    cerr << _result->when.time << " " << _result->when.offset << endl;
     SEXP result = Signature::create(_result);
     git_signature_free(_result);
     return result;
+}
+
+RCPP_MODULE(guitar)
+{
+    function("make_signature", &Signature::now);
 }

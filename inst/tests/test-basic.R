@@ -1,11 +1,27 @@
+library(stringr)
+
 context("basic sanity checks.")
 
 repo.path = paste(tempdir(), "/repo1", sep="")
 
 setup.tests <- function ()
 {
-  system(paste("tar xzf ", system.file(package="guitar"), "/data/test-repos/repo1.tar.gz", " -C ", tempdir(), sep=""))
+  system(str_c("tar xzf ", system.file(package="guitar"),
+               "/data/test-repos/repo1.tar.gz", " -C ", tempdir()))
 }
+
+teardown.tests <- function ()
+{
+  system(str_c("rm -rf ", repo.path))
+}
+
+reset.tests <- function()
+{
+  teardown.tests();
+  setup.tests();
+}
+
+################################################################################
 
 setup.tests()
 
@@ -55,3 +71,37 @@ test_that("ODBs have OIDs which can be looked up", {
   }
 })
 
+test_that("Objects can be added to the index", {
+  r <- new(guitar::Repository, repo.path)
+  index <- r$index()
+  p <- str_c(repo.path, "/file3")
+  cat("some content", file=p, append=TRUE)
+  cat("some more content", file=p, append=TRUE)
+  index$add_by_path("file3")
+  index$write() # write() is needed to write index to disk
+})
+
+test_that("Commit can be created", {
+  reset.tests(); # delete repo so we can re-add things to index
+  r <- new(guitar::Repository, repo.path)
+  index <- r$index()
+  p <- str_c(repo.path, "/file3")
+  cat("some content", file=p, append=TRUE)
+  cat("some more content", file=p, append=TRUE)
+  index$add_by_path("file3")
+  index$write() # write() is needed to write index to disk
+  oid <- index$write_tree()
+  tree <- r$object_lookup(oid, GIT_OBJ_TREE)
+  expect_that(tree, is_a("Rcpp_Tree"))
+  sig <- make_signature("Carlos Scheidegger",
+                        "cscheid@research.att.com")
+  cat("Before\n")
+  r$create_commit("HEAD", sig, sig,
+                  "UTF-8", "This is a message.\n",
+                  tree, list(r$head()$peel(GIT_OBJ_COMMIT)))
+  cat("After\n")
+})
+
+cat(str_c(repo.path, "\n"))
+
+## teardown.tests()

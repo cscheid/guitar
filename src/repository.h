@@ -51,6 +51,14 @@ public:
     // (that is, one of the subclasses of git_object)
     SEXP object_lookup(SEXP oid, int otype);
 
+    void create_commit(std::string update_ref,
+                       SEXP author,
+                       SEXP committer,
+                       std::string message_encoding,
+                       std::string message,
+                       SEXP tree,
+                       SEXP parents);
+
     git_repository *unwrap() { return repo.get(); }
 
 protected:
