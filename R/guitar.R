@@ -31,7 +31,7 @@ add_file_to_head <- function(repository, local.path, path.in.repository,
     stop("Only for non-bare repos")
   repo.path <- repository$workdir()
   destination.path <- str_c(repo.path, path.in.repository)
-  file.copy(local.path, destination.path)
+  file.copy(local.path, destination.path, overwrite=TRUE)
   index <- repository$index()
   index$add_by_path(path.in.repository)
   index$write()
