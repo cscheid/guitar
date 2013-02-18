@@ -63,6 +63,7 @@ remove_file_from_head <- function(repository, path.in.repository,
               else list(repository$head()$peel(GIT_OBJ_COMMIT)))
   repository$create_commit("HEAD", sig, sig, "UTF-8", commit_message,
                            tree, parents);
+  unlink(str_c(repository$workdir(),"/",path.in.repository))
 }
 
 ################################################################################
