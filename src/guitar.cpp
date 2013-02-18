@@ -68,7 +68,6 @@ SEXP Signature::now(std::string name, std::string email)
 {
     git_signature *_result;
     git_signature_now(&_result, name.c_str(), email.c_str());
-    cerr << _result->when.time << " " << _result->when.offset << endl;
     SEXP result = Signature::create(_result);
     git_signature_free(_result);
     return result;

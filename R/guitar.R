@@ -20,6 +20,51 @@
   ref$.pointer
 }
 
+# convenience method to add and commit a single file to the repository HEAD
+# only works for non-bare repositories
+add_file_to_head <- function(repository, local.path, path.in.repository,
+                             user=Sys.getenv("USER"),
+                             email=Sys.getenv("EMAIL"),
+                             commit_message="")
+{
+  if (repository$is_bare())
+    stop("Only for non-bare repos")
+  repo.path <- repository$workdir()
+  destination.path <- str_c(repo.path, path.in.repository)
+  file.copy(local.path, destination.path)
+  index <- repository$index()
+  index$add_by_path(path.in.repository)
+  index$write()
+  oid <- index$write_tree()
+  tree <- repository$object_lookup(oid, GIT_OBJ_TREE)
+  email <- if (email == "") "Unknown" else email
+  sig <- make_signature(user, email)
+  parents <- (if (repository$is_empty()) list()
+              else list(repository$head()$peel(GIT_OBJ_COMMIT)))
+  repository$create_commit("HEAD", sig, sig, "UTF-8", commit_message,
+                           tree, parents);
+}
+
+remove_file_from_head <- function(repository, path.in.repository,
+                                  user=Sys.getenv("USER"),
+                                  email=Sys.getenv("EMAIL"),
+                                  commit_message="")
+{
+  if (repository$is_bare())
+    stop("Only for non-bare repos")
+  index <- repository$index()
+  index$remove_by_path(path.in.repository)
+  index$write()
+  oid <- index$write_tree()
+  tree <- repository$object_lookup(oid, GIT_OBJ_TREE)
+  email <- if (email == "") "Unknown" else email
+  sig <- make_signature(user, email)
+  parents <- (if (repository$is_empty()) list()
+              else list(repository$head()$peel(GIT_OBJ_COMMIT)))
+  repository$create_commit("HEAD", sig, sig, "UTF-8", commit_message,
+                           tree, parents);
+}
+
 ################################################################################
 # types.h
 

@@ -6,6 +6,9 @@
 #include "odb.h"
 #include "tree.h"
 #include "commit.h"
+#include <iostream>
+
+using namespace std;
 
 /******************************************************************************/
 Repository::Repository(git_repository *_repo)
@@ -201,10 +204,12 @@ void Repository::create_commit(std::string update_ref,
 Rcpp::Reference repository_init(std::string path, bool is_bare)
 {
     BEGIN_RCPP
-    git_repository *_repo;
+    git_repository *_repo = NULL;
     int err = git_repository_init(&_repo, path.c_str(), (unsigned) is_bare);
     if (err)
         throw Rcpp::exception("git_repository_init failed");
+    if (_repo == NULL)
+        throw Rcpp::exception("repository could not be created");
     return Repository::create(_repo);
     END_RCPP
 }
