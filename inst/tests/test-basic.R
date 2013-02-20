@@ -129,9 +129,16 @@ test_that("add_file_to_head convenience function works", {
 
 test_that("remove_file_from_head function works", {
   reset.tests(); # delete repo so we can re-add things to index
-  r <- new(guitar::Repository, existing.repo.path);
+  r <- new(guitar::Repository, existing.repo.path)
   remove_file_from_head(r, "file1")
   expect_that(r$index()$get_by_path("file1", 0), throws_error())
 })
 
-## teardown.tests()
+test_that("commits expose trees and tree_ids", {
+  r <- new(guitar::Repository, existing.repo.path)
+  c <- r$head()$peel(GIT_OBJ_COMMIT)
+  expect_that(c$tree(), is_a("Rcpp_Tree"));
+  expect_that(c$tree_id(), is_a("Rcpp_OID"));
+})
+
+teardown.tests()

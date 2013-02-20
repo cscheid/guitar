@@ -16,6 +16,8 @@ public:
     SEXP committer();
     SEXP author();
     int type();
+    SEXP tree();
+    Rcpp::Reference tree_id();
 
     unsigned int parent_count();
 

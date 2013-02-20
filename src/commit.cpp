@@ -2,6 +2,7 @@
 #include "oid.h"
 #include "entry_points.h"
 #include "time.h"
+#include "tree.h"
 
 /******************************************************************************/
 
@@ -18,6 +19,12 @@ Commit::Commit(git_commit *_commit)
 Rcpp::Reference Commit::id()
 {
     const git_oid *result = git_object_id((const git_object *)commit.get());
+    return OID::create(result);
+}
+
+Rcpp::Reference Commit::tree_id()
+{
+    const git_oid *result = git_commit_tree_id(commit.get());
     return OID::create(result);
 }
 
@@ -47,6 +54,13 @@ SEXP Commit::committer()
 SEXP Commit::author()
 {
     return Signature::create(git_commit_author(commit.get()));
+}
+
+SEXP Commit::tree()
+{
+    git_tree *result;
+    git_commit_tree(&result, commit.get());
+    return Tree::create(result);
 }
 
 int Commit::type()
@@ -117,5 +131,7 @@ RCPP_MODULE(guitar_commit) {
         .method("parent_list", &Commit::parent_list)
         .method("parent_id", &Commit::parent_id)
         .method("parent_id_list", &Commit::parent_id_list)
+        .method("tree", &Commit::tree)
+        .method("tree_id", &Commit::tree_id)
         ;
 }
