@@ -18,6 +18,7 @@ public:
     Rcpp::Reference entry_by_index(size_t idx);
     Rcpp::Reference entry_by_name(std::string filename);
     Rcpp::Reference entry_by_oid(SEXP oid);
+    Rcpp::Reference entry_by_path(std::string path);
 
 protected:
     boost::shared_ptr<git_tree> tree;

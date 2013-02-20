@@ -66,6 +66,17 @@ Rcpp::Reference Tree::entry_by_name(std::string name)
     END_RCPP
 }
 
+Rcpp::Reference Tree::entry_by_path(std::string name)
+{
+    BEGIN_RCPP
+    git_tree_entry *entry;
+    int err = git_tree_entry_bypath(&entry, tree.get(), name.c_str());
+    if (err)
+        throw Rcpp::exception("entry not found");
+    return TreeEntry::create(entry);
+    END_RCPP
+}
+
 Rcpp::Reference Tree::entry_by_oid(SEXP oid)
 {
     BEGIN_RCPP
@@ -127,6 +138,7 @@ RCPP_MODULE(guitar_tree) {
         .method("entry_by_index", &Tree::entry_by_index)
         .method("entry_by_name", &Tree::entry_by_name)
         .method("entry_by_oid", &Tree::entry_by_oid)
+        .method("entry_by_path", &Tree::entry_by_path)
         ;
     class_<TreeEntry>("TreeEntry")
         .method("file_mode", &TreeEntry::file_mode)
