@@ -5,7 +5,7 @@
   
   ## loadRcppModules();
   ns <- asNamespace(pkgname);
-  description <- packageDescription(pkgname, libname)
+  description <- utils::packageDescription(pkgname, libname)
   modules <- strsplit(description[["RcppModules"]], "[[:space:]]*,[[:space:]]*")[[1L]]
   for (m in modules) {
     mod <- Rcpp::Module(m, pkgname, mustStart = TRUE)
